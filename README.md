@@ -1,7 +1,15 @@
-This repository is for developing the new business logic for Pullonkaula's Drinkrobot.
+Drinkkirobotti_4_1
 --
-Main developers: Ville Lepistö, Oskari Burri, Teemu Laine and Teemu Linnapuomi  
-Main functionality:  
->-Business logic will run as a Windows Service and feature a GUI for tracking functions and debugging.  
->-Business logic will communicate with a UI service which is serving operators and end-users via TCP.  
->-Business logic will also handle communicating with the physical devices in the cell, i.e. the robot controller.  
+This repository is for developing the new business logic for Pullonkaula's Drinkrobot.  
+
+Short description:  
+ -Business logic will be developed in C#.  
+ -It will run as a Windows Service and feature a GUI for tracking functions and debugging.  
+ -Service will use TCP to communicate with an external UI service serving operators and end-users.  
+ -Service will also handle communications with the most of the physical devices in the cell, i.e. the robot controller.  
+ 
+ Main developers for the business logic:   
+ -Ville Lepistö  
+ -Oskari Burri  
+ -Teemu Laine   
+ -Teemu Linnapuomi  
