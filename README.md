@@ -13,3 +13,5 @@ Short description:
  -Oskari Burri  
  -Teemu Laine   
  -Teemu Linnapuomi  
+  
+ Trello: https://trello.com/c/g7EdRs0I/33-ui-back-end-c-net  
