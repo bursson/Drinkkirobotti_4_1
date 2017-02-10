@@ -1,2 +1,3 @@
-9.2.2017: Created solution with the projects for the service and project for the operator gui.
-8.2.2017: Created repository after the initial meeting.
+10.2.2017: Created Common-project, including TCP-server and client and NLogExtensions.
+09.2.2017: Created solution with the projects for the service and project for the operator gui.
+08.2.2017: Created repository after the initial meeting.
