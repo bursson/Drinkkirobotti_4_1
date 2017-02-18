@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotService", "RobotService\RobotService.csproj", "{B6636656-0472-4521-9FCD-98517D6CB20F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{00DBAE2E-596F-4501-8E80-E312CE787439} = {00DBAE2E-596F-4501-8E80-E312CE787439}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OperatorGUI", "OperatorGUI\OperatorGUI.csproj", "{3492D712-B6F9-452D-813F-47F2357929F8}"
 EndProject
