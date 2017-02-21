@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using NLog;
 
 namespace Common
 {   
@@ -25,6 +26,8 @@ namespace Common
             _receiveTimeoutMs = receiveTimeoutMs;
             _tcpListener = TcpListener.Create(port);
         }
+        
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// Holds received messages.
@@ -103,7 +106,7 @@ namespace Common
                 return false;
             }
 
-            Clog.DebugC(funcName, $"[{_logName}] Sending message {msg}");
+            Log.DebugEx(funcName, $"[{_logName}] Sending message {msg}");
 
             // Add end chars here
             var msgBytes = Encoding.UTF8.GetBytes(msg + (_implicitEndOfMessageString ? _endOfMessageString : string.Empty));
@@ -209,14 +212,14 @@ namespace Common
             
             _tcpListener.Start();
 
-            Clog.InformationC(funcName, $"[{_logName}] Start listening to port {_port}");
+            Log.InfoEx(funcName, $"[{_logName}] Start listening to port {_port}");
 
             // Register CancellationToken to call _tcpListener.Stop() on cancel.
             // AcceptTcpClientAsync() then throws SocketException and cancels properly.
             using (ct.Register(() => _tcpListener.Stop()))
             {
                 await MainTask(ct).ContinueWith(t =>
-                    Clog.DebugC(funcName, $"[{_logName}] Stop listening to port {_port}"), CancellationToken.None);
+                    Log.DebugEx(funcName, $"[{_logName}] Stop listening to port {_port}"), CancellationToken.None);
             }
         }
 
@@ -238,7 +241,7 @@ namespace Common
                     _sendMessageFailedSignal = new SemaphoreSlim(0, 1);
                     _receiveMessageSignal = new SemaphoreSlim(0, 1);
 
-                    Clog.InformationC(funcName, $"[{_logName}] New connection received {_tcpClient.Client.RemoteEndPoint}");
+                    Log.InfoEx(funcName, $"[{_logName}] New connection received {_tcpClient.Client.RemoteEndPoint}");
 
                     // Throw InvalidOperationException when disconnected and trying to get stream.
                     _tcpStream = _tcpClient.GetStream();
@@ -254,7 +257,7 @@ namespace Common
                     // Check CancellationToken.
                     ct.ThrowIfCancellationRequested();
 
-                    Clog.DebugC(funcName, e.ToString());
+                    Log.DebugEx(funcName, e.ToString());
                     await Task.Delay(10000, ct);
 
                     continue;
@@ -279,7 +282,7 @@ namespace Common
                     ConnectionStatus = ConnectionStatusEnum.Disconnected;
                     _tcpStream.Dispose();
                     _tcpClient.Close();
-                    Clog.DebugC(funcName, $"[{_logName}] Connection lost");
+                    Log.DebugEx(funcName, $"[{_logName}] Connection lost");
 
                     if (!_messageQueue.IsEmpty || _messageInQueue.CurrentCount > 0)
                     {
@@ -351,7 +354,7 @@ namespace Common
                     var msg = result.Substring(0, _implicitEndOfMessageString ? msgEndIndex : msgEndIndex + _endOfMessageString.Length);
                     result = result.Substring(msgEndIndex + _endOfMessageString.Length);
 
-                    Clog.DebugC(funcName, $"[{_logName}] Received message {msg}");
+                    Log.DebugEx(funcName, $"[{_logName}] Received message {msg}");
 
                     // Check token before adding message.
                     ct.ThrowIfCancellationRequested();

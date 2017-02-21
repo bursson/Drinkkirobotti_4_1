@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using NLog;
 
 namespace Common
 {
@@ -45,6 +46,8 @@ namespace Common
             _logName = logName;
             _receiveTimeoutMs = receiveTimeoutMs;
         }
+        
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// Holds received messages.
@@ -124,7 +127,7 @@ namespace Common
                 return false;
             }
 
-            Clog.DebugC(funcName, $"[{_logName}] Sending message {msg}");
+            Log.DebugEx(funcName, $"[{_logName}] Sending message {msg}");
 
             // Add end chars here
             var msgBytes = Encoding.UTF8.GetBytes(msg + (_implicitEndOfMessageString ? _endOfMessageString : string.Empty));
@@ -229,14 +232,14 @@ namespace Common
         {
             const string funcName = nameof(Run);
             
-            Clog.InformationC(funcName, $"[{_logName}] Start client connection to host {_hostIp}:{_hostPort}");
+            Log.InfoEx(funcName, $"[{_logName}] Start client connection to host {_hostIp}:{_hostPort}");
 
             // Register CancellationToken to call _tcpClient.Close() on cancel.
             // ConnectAsync() then throws ObjectDisposedException and cancels properly.
             using (ct.Register(() => _tcpClient?.Close()))
             {
                 await MainTask(ct).ContinueWith(t =>
-                    Clog.DebugC(funcName, $"[{_logName}] Stop client connection to host {_hostIp}:{_hostPort}"), CancellationToken.None);
+                    Log.DebugEx(funcName, $"[{_logName}] Stop client connection to host {_hostIp}:{_hostPort}"), CancellationToken.None);
             }
         }
 
@@ -259,7 +262,7 @@ namespace Common
                     _sendMessageFailedSignal = new SemaphoreSlim(0, 1);
                     _receiveMessageSignal = new SemaphoreSlim(0, 1);
 
-                    Clog.InformationC(funcName, $"[{_logName}] Connected to {_tcpClient.Client.RemoteEndPoint}");
+                    Log.InfoEx(funcName, $"[{_logName}] Connected to {_tcpClient.Client.RemoteEndPoint}");
 
                     // Throw InvalidOperationException when disconnected and trying to get stream.
                     _tcpStream = _tcpClient.GetStream();
@@ -275,7 +278,7 @@ namespace Common
                     // Check CancellationToken.
                     ct.ThrowIfCancellationRequested();
 
-                    Clog.DebugC(funcName, e.ToString());
+                    Log.DebugEx(funcName, e.ToString());
                     await Task.Delay(10000, ct);
 
                     continue;
@@ -300,7 +303,7 @@ namespace Common
                     ConnectionStatus = ConnectionStatusEnum.Disconnected;
                     _tcpStream.Dispose();
                     _tcpClient.Close();
-                    Clog.DebugC(funcName, $"[{_logName}] Connection lost");
+                    Log.DebugEx(funcName, $"[{_logName}] Connection lost");
 
                     if (!_messageQueue.IsEmpty || _messageInQueue.CurrentCount > 0)
                     {
@@ -372,7 +375,7 @@ namespace Common
                     var msg = result.Substring(0, _implicitEndOfMessageString ? msgEndIndex : msgEndIndex + _endOfMessageString.Length);
                     result = result.Substring(msgEndIndex + _endOfMessageString.Length);
 
-                    Clog.DebugC(funcName, $"[{_logName}] Received message {msg}");
+                    Log.DebugEx(funcName, $"[{_logName}] Received message {msg}");
 
                     // Check token before adding message.
                     ct.ThrowIfCancellationRequested();
@@ -381,19 +384,6 @@ namespace Common
                     _messageInQueue.Release();
                 }
             }
-        }
-    }
-
-    public class Clog
-    {
-        public static void DebugC(string funcName, string s)
-        {
-            Console.WriteLine($"{funcName}: {s}");
-        }
-
-        public static void InformationC(string funcName, string s)
-        {
-            Console.WriteLine($"{funcName}: {s}");
         }
     }
 }
