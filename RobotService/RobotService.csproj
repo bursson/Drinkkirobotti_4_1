@@ -55,6 +55,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Exceptions.cs" />
     <Compile Include="Communication.cs" />
     <Compile Include="Core.cs" />
     <Compile Include="Launcher.cs" />

@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO.Ports;
 using System.Threading;
+using Common;
+using NLog;
 
 namespace RobotService
 {
@@ -15,15 +17,24 @@ namespace RobotService
 
     class DummyComm : IDeviceComm
     {
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+
+        public DummyComm()
+        {
+            Log.Info("Using virtual serial port. All actions succeed after a second");
+        }
         public async Task<bool> SendCommand(string command)
         {
+            Log.Debug($"Virtual serial: Excecuting command: {command}");
             await Task.Delay(1000);
             return true;
         }
+   
     }
 
     class SerialComm : IDeviceComm
     {
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
         private const string Endsign = "!";
         private const string Startedsign = ";STARTED";
         private const string Completionsign = ";COMPLETE";
@@ -35,20 +46,17 @@ namespace RobotService
         /// Class for simple serial communication
         /// </summary>
         /// <param name="portname">Port for the communication ex. "COM3"</param>
-        /// <param name="baud">Baudrate for communication "9600"</param>
+        /// <param name="baud">Baudrate for communication ex. "9600"</param>
         /// <param name="readtimeout">Max time to completion, 0 for infinite wait</param>
-        public SerialComm(string portname, int baud, int readtimeout, int writetimeout)
+        /// <param name="writetimeout">Max time for writing, default 500</param>
+        public SerialComm(string portname, int readtimeout, int writetimeout = 500, int baud = 9600)
         {
             _serialPort = new SerialPort();
 
             // Allow the user to set the appropriate properties.
             _serialPort.PortName = portname;
             _serialPort.BaudRate = baud;
-            _serialPort.Parity = _serialPort.Parity;
-            _serialPort.DataBits = _serialPort.DataBits;
-            _serialPort.StopBits = _serialPort.StopBits;
-            _serialPort.Handshake = _serialPort.Handshake;
-
+           
             // Set the read/write timeouts
             _serialPort.ReadTimeout = readtimeout > 0 ? readtimeout : SerialPort.InfiniteTimeout;
             _serialPort.WriteTimeout = writetimeout;
@@ -61,15 +69,27 @@ namespace RobotService
             _serialPort.Close();
         }        
 
+        /// <summary>
+        /// Send a command to a serial device. Expects a confirmation for starting and
+        /// finishing the action.
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns>True if action was performed correctly, false if could not write to serial</returns>
         public async Task<bool> SendCommand(string command)
         {
             try
             {
                 _serialPort.WriteLine(command);
             }
-            catch (TimeoutException)
+            catch (AggregateException e)
             {
-                // log this
+                e.Handle((x) =>
+                {
+                    if (!(x is TimeoutException)) return false;
+                    Log.Error("Writing " + command + " to serial " + _serialPort.PortName + " timed out");
+                    return true;
+                });
+
                 return false;
             }
 
@@ -79,16 +99,25 @@ namespace RobotService
 
             if (readTask.Result != expected)
             {
-                // throw something about robot not responding / false response
+                Log.Fatal(_serialPort.PortName + $" : Got:\"{readTask.Result}\", expected: \" {expected}\"");
+                throw new SerialCommException(_serialPort.PortName,$"Got:\"{readTask.Result}\", expected: \" {expected}\"");
             }
 
             expected = command + Endsign;
             readTask = Read();
 
             await readTask;
-            return readTask.Result == expected;
+
+            if (readTask.Result == expected) return true;
+
+            Log.Fatal(_serialPort.PortName + $" : Got:\"{readTask.Result}\", expected: \" {expected}\"");
+            throw new SerialCommException(_serialPort.PortName, $"Got:\"{readTask.Result}\", expected: \" {expected}\"");
         }
 
+        /// <summary>
+        /// Read serial until the designated Endsign.
+        /// </summary>
+        /// <returns>String read. Null if timeout occured</returns>
         private static async Task<string> Read()
         {
             try
@@ -101,12 +130,9 @@ namespace RobotService
             {
                 e.Handle((x) =>
                 {
-                    if (x is TimeoutException)
-                    {
-                        // Read timeout occured, log it
-                        return true;
-                    }
-                    return false;
+                    if (!(x is TimeoutException)) return false;
+                    Log.Error("Read from serial" + _serialPort.PortName + "timed out");
+                    return true;
                 });
 
                 return null;
