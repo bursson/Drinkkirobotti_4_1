@@ -16,8 +16,6 @@ namespace RobotService
         public static async Task Run(CancellationTokenSource cts)
         {
             const string fname = nameof(Run);
-            Log.DebugEx(fname, "Hello world");
-
             try
             {
                 await MainLogic(cts.Token);
@@ -26,10 +24,11 @@ namespace RobotService
             {
                 Log.DebugEx(fname, "Canceled");
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Log.FatalEx(fname, e.ToString());
                 cts.Cancel();
-                throw;
+                Environment.Exit(1);
             }
         }
 

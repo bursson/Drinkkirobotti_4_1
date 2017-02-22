@@ -32,7 +32,6 @@ namespace RobotService
             catch (Exception e)
             {
                 Log.FatalEx(fname, e.ToString());
-                Environment.Exit(1);
             }
         }
     }
