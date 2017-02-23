@@ -5,8 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OperatorUI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="350" Width="525"
+        Closing="MainWindow_OnClosing">
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Button Grid.Column="0" Height="100" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Button_Click">PING</Button>
+        <TextBlock Grid.Column="1" Text="{Binding Counter, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
     </Grid>
 </Window>

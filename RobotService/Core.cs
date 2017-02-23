@@ -35,7 +35,11 @@ namespace RobotService
         private static async Task MainLogic(CancellationToken ct)
         {
             // Main logic here
-            await Task.Delay(-1, ct);
+            var operatorTask = OperatorConnection.Run(ct);
+            var delayTask = Task.Delay(-1, ct);
+
+            var done = await Task.WhenAny(operatorTask, delayTask);
+            ct.ThrowIfCancellationRequested();
         }
     }
 }

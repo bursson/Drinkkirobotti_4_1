@@ -170,7 +170,7 @@ namespace Common
                 ct.ThrowIfCancellationRequested();
                 localCts.Cancel();
 
-                if (msgInQueue == done) return null;
+                if (connChanged == done) return null;
 
                 // There is a message after _messageInQueue is released.
                 string msg;
