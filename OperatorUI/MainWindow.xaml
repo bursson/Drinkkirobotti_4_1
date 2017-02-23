@@ -5,14 +5,129 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OperatorUI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525"
+        Title="MainWindow"
+        Height="600"
+        Width="800"
         Closing="MainWindow_OnClosing">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"></ColumnDefinition>
-            <ColumnDefinition></ColumnDefinition>
-        </Grid.ColumnDefinitions>
-        <Button Grid.Column="0" Height="100" Width="100" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Button_Click">PING</Button>
-        <TextBlock Grid.Column="1" Text="{Binding Counter, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+    <Grid Margin="5,5,5,5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="3*"></RowDefinition>
+            <RowDefinition Height="5"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <TabControl>
+            <TabItem Header="Overview">
+                <DockPanel LastChildFill="True">
+                    <Grid Width="300">
+                        <Button Height="100"
+                                Width="100"
+                                Margin="5,5,0,0"
+                                Click="Button_Click"
+                                DockPanel.Dock="Left"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top">
+                            PING
+                        </Button>
+                        <Button Height="100"
+                                Width="100"
+                                Margin="5,5,0,0"
+                                Click="Button_Click"
+                                DockPanel.Dock="Left">
+                            Teen asioita 1
+                        </Button>
+                        <TextBlock Text="{Binding Counter, UpdateSourceTrigger=PropertyChanged}"
+                                   Margin="5,5,0,0">
+
+                        </TextBlock>
+                    </Grid>
+                    <Grid>
+                        <TextBlock Text="TODO: Drinkkihyllystä kuva tähän"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center">
+                            
+                        </TextBlock>
+                    </Grid>
+                </DockPanel>
+            </TabItem>
+            <TabItem Header="random shit 1">
+            </TabItem>
+            <TabItem Header="random shit 2">
+            </TabItem>
+        </TabControl>
+        <GridSplitter Grid.Row="1"
+                      Height="5"
+                      HorizontalAlignment="Stretch" />
+        <DockPanel Grid.Row="2"
+                   LastChildFill="True">
+            <TextBox Text="Log" 
+                     DockPanel.Dock="Top"/>
+            <TextBox DockPanel.Dock="Top" 
+                     Margin="5,5,5,5"/>
+        </DockPanel>
+
     </Grid>
 </Window>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
