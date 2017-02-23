@@ -55,6 +55,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enum.cs" />
+    <Compile Include="LogicClasses.cs" />
     <Compile Include="Exceptions.cs" />
     <Compile Include="Communication.cs" />
     <Compile Include="Core.cs" />
