@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Common;
 using NLog;
+using ServiceLayer;
 
 namespace RobotService
 {

@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO.Ports;
-using System.Threading;
-using Common;
+using System.Threading.Tasks;
 using NLog;
+using Common;
 
-namespace RobotService
+namespace RobotCellLayer
 {
     interface IDeviceComm
     {

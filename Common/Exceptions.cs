@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace RobotService
+namespace Common
 {
-    internal class SerialCommException : Exception
+    public class SerialCommException : Exception
     {
         private readonly string _portname;
         private readonly string _message;

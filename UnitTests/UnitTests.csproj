@@ -54,9 +54,25 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{00dbae2e-596f-4501-8e80-e312ce787439}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LogicLayer\LogicLayer.csproj">
+      <Project>{fa25098f-36c1-4565-96fc-434f63cf08e7}</Project>
+      <Name>LogicLayer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RobotCellLayer\RobotCellLayer.csproj">
+      <Project>{b9889c36-b067-4395-9561-309d37b6ea81}</Project>
+      <Name>RobotCellLayer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RobotService\RobotService.csproj">
       <Project>{b6636656-0472-4521-9fcd-98517d6cb20f}</Project>
       <Name>RobotService</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ServiceLayer\ServiceLayer.csproj">
+      <Project>{5c636dd7-2e28-4ca2-8599-73d703fdadf1}</Project>
+      <Name>ServiceLayer</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>
