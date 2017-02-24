@@ -18,10 +18,10 @@ namespace RobotService
         }
 
         public string Name { get; set; }
-        public int MaxVolume { get; }
+        public int MaxVolume { get; private set; }
         public int Volume { get; set; }
         public bool IsAlcoholic { get; }
-        public int PourSpeed { get; set; }
+        public int PourSpeed { get; private set; }
 
         public bool Pour(int amount)
         {
@@ -58,7 +58,7 @@ namespace RobotService
     }
     public class Drink
     {
-        private List<Portion> _portions;
+        private readonly List<Portion> _portions;
         public string Name { get; set; }
 
         public Drink(string name)
@@ -117,9 +117,9 @@ namespace RobotService
     }
     public class Order
     {
-        private static OrderType _orderType;
-        private static int _id;
-        private static Drink _drink;
+        private readonly OrderType _orderType;
+        private readonly int _id;
+        private Drink _drink;
 
         /// <summary>
         /// Create new order
@@ -134,17 +134,17 @@ namespace RobotService
             _drink = drink;
         }
         
-        public static int GetId()
+        public int GetId()
         {
             return _id;
         }
 
-        public static OrderType GetOrderType()
+        public OrderType GetOrderType()
         {
             return _orderType;
         }
 
-        public static Drink GetRecipe()
+        public Drink GetRecipe()
         {
             return _drink;
         }
@@ -153,9 +153,7 @@ namespace RobotService
 
     public class Bottleshelf
     {
-        private Bottle[] _content;
-
-        public Bottle[] Shelf => _content;
+        public Bottle[] Shelf { get; }
 
         /// <summary>
         /// Create a new bottle shelf
@@ -163,7 +161,7 @@ namespace RobotService
         /// <param name="size">Maximum amout of bottles in the shelf</param>
         public Bottleshelf(int size)
         {
-            _content = new Bottle[size];
+            Shelf = new Bottle[size];
         }
 
         /// <summary>
@@ -176,9 +174,9 @@ namespace RobotService
             if (newbottle == null) throw new ArgumentNullException(nameof(newbottle));
             for (int i = 0; i < Size(); i++)
             {
-                if (_content[i] == null)
+                if (Shelf[i] == null)
                 {
-                    _content[i] = newbottle;
+                    Shelf[i] = newbottle;
                     return true;
                 }
             }
@@ -194,9 +192,9 @@ namespace RobotService
         {
             for (int i = 0; i < Size(); i++)
             {
-                if (_content[i] != null && _content[i].Name == bottlename)
+                if (Shelf[i] != null && Shelf[i].Name == bottlename)
                 {
-                    _content[i] = null;
+                    Shelf[i] = null;
                     return true;
                 }
                 
@@ -213,9 +211,9 @@ namespace RobotService
             if (bottle == null) throw new ArgumentNullException(nameof(bottle));
             for (int i = 0; i < Size(); i++)
             {
-                if (_content[i] == bottle)
+                if (Shelf[i] == bottle)
                 {
-                    _content[i] = null;
+                    Shelf[i] = null;
                     return true;
                 }
 
@@ -232,9 +230,9 @@ namespace RobotService
         {
             for (int i = 0; i < Size(); i++)
             {
-                if (_content[i] != null && _content[i].Name == bottlename)
+                if (Shelf[i] != null && Shelf[i].Name == bottlename)
                 {
-                    return _content[i];
+                    return Shelf[i];
                 }
             }
             return null;
@@ -244,7 +242,7 @@ namespace RobotService
         /// Get the size of the shelf
         /// </summary>
         /// <returns>Size of the shelf</returns>
-        public int Size(){ return _content.Length; }
+        public int Size(){ return Shelf.Length; }
 
       
 
@@ -257,7 +255,7 @@ namespace RobotService
             int res = 0;
             for (int i = 0; i < Size(); i++)
             {
-                if (_content[i] == null)
+                if (Shelf[i] == null)
                 {
                     ++res;
                 }

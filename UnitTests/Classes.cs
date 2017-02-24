@@ -16,7 +16,8 @@ namespace UnitTests
         private List<Bottle> _bottleshelf;
         private List<Drink> _drinkdb;
         private Bottleshelf _bs;
-
+        private OrderQueue _queue;
+             
         private int shelfsize = 10;
 
         [TestInitialize]
@@ -25,6 +26,7 @@ namespace UnitTests
             _bottleshelf = new List<Bottle>(); //TODO: replace with actual bottleshelf
             _drinkdb = new List<Drink>();
             _bs = new Bottleshelf(shelfsize);
+            _queue = new OrderQueue();
         }
 
         [TestMethod]
@@ -45,6 +47,7 @@ namespace UnitTests
             Assert.AreEqual(_bs.AvailableSlots(), 3);
             Assert.IsNull(_bs.Find("Testbottle"));
             var checkBottle = _bs.Find("Testbottle3");
+            Assert.AreEqual(100, checkBottle.MaxVolume);
             Assert.AreEqual(checkBottle.Name,"Testbottle3");
 
             var shelf = _bs.Shelf;
@@ -81,11 +84,11 @@ namespace UnitTests
         {
             var justADrink = new Drink("some");
             var justAOrder = new Order(OrderType.Drink, 1, justADrink);
-            Assert.AreEqual(Order.GetId(), 1, "OrderID");
-            Assert.AreEqual(Order.GetOrderType(), OrderType.Drink, "Ordertype");
+            Assert.AreEqual(justAOrder.GetId(), 1, "OrderID");
+            Assert.AreEqual(justAOrder.GetOrderType(), OrderType.Drink, "Ordertype");
             justADrink.AddPortion(new Portion(new Bottle("a"), 3));
             justAOrder = new Order(OrderType.Drink, 2, justADrink);
-            Assert.AreEqual(Order.GetRecipe(), justADrink, "Getrecipe");
+            Assert.AreEqual(justAOrder.GetRecipe(), justADrink, "Getrecipe");
 
             justADrink.AddPortion(new Portion(new Bottle("b"), 10));
             Assert.IsFalse(justADrink.RemovePortion("c"));
@@ -134,6 +137,32 @@ namespace UnitTests
 
             }
 
+        }
+
+        [TestMethod]
+        public void Orderqueue()
+        {
+            Assert.AreEqual(_queue.Count, 0, "Queuecount1");
+            Assert.IsTrue(_queue.Add(new Order(OrderType.Sparkling, 1), 10));
+            Assert.AreEqual(_queue.Count, 1, "Queuecount2");
+            Assert.IsTrue(_queue.Add(new Order(OrderType.Beer, 2), 88));
+            Assert.AreEqual(_queue.Count, 2, "Queuecount3");
+            Assert.IsTrue(_queue.Add(new Order(OrderType.Drink, 3, new Drink("A")), 10));
+            Assert.IsTrue(_queue.Add(new Order(OrderType.Drink, 0, new Drink("B")), 10));
+
+            Assert.AreEqual(_queue.Pop().GetOrderType(), OrderType.Beer, "Queue1" );
+            Assert.AreEqual(_queue.Pop().GetRecipe().Name, "B", "Queue2");
+            Assert.AreEqual(_queue.Pop().GetOrderType(), OrderType.Sparkling, "Queue3");
+            Assert.AreEqual(_queue.Pop().GetRecipe().Name, "A", "Queue4");
+            for (int i = 0; i < 20; i++)
+            {
+                Assert.IsTrue(_queue.Add(new Order(OrderType.Sparkling, i), 10));
+            }
+            for (int i = 0; i < 20; i++)
+            {
+                Assert.AreEqual(i, _queue.Pop().GetId());
+            }
+            Assert.IsNull(_queue.Pop());
         }
     }
 }
