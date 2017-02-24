@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
+using System.Security.Cryptography;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RobotService;
 
 
-namespace RobotService
+namespace UnitTests
 {
     [TestClass]
     [SuppressMessage("ReSharper", "SuggestVarOrType_SimpleTypes")]
@@ -14,26 +15,64 @@ namespace RobotService
     {
         private List<Bottle> _bottleshelf;
         private List<Drink> _drinkdb;
+        private Bottleshelf _bs;
+
+        private int shelfsize = 10;
+
         [TestInitialize]
         public void InitClasses()
         {
             _bottleshelf = new List<Bottle>(); //TODO: replace with actual bottleshelf
             _drinkdb = new List<Drink>();
-
+            _bs = new Bottleshelf(shelfsize);
         }
 
+        [TestMethod]
+        public void TestBottleshelf()
+        {
+            Assert.AreEqual(_bs.Size(), shelfsize, "Bottleshelf size");
+            Assert.AreEqual(_bs.AvailableSlots(), shelfsize, "Bottleshelf available shelfsize");
+            for (int i = 0; i < shelfsize; i++)
+            {
+                _bs.AddBottle(new Bottle("Testbottle" + i));
+                Assert.AreEqual(_bs.AvailableSlots(), shelfsize-1-i);
+            }
+            Assert.IsFalse(_bs.AddBottle(new Bottle("fail")), "Bottleshelf overflow");
+            Assert.IsTrue(_bs.RemoveBottle("Testbottle5"));
+            Assert.AreEqual(_bs.AvailableSlots(), 1);
+            Assert.IsTrue(_bs.RemoveBottle("Testbottle0"));
+            Assert.IsTrue(_bs.RemoveBottle("Testbottle9"));
+            Assert.AreEqual(_bs.AvailableSlots(), 3);
+            Assert.IsNull(_bs.Find("Testbottle"));
+            var checkBottle = _bs.Find("Testbottle3");
+            Assert.AreEqual(checkBottle.Name,"Testbottle3");
+
+            var shelf = _bs.Shelf;
+            Assert.AreEqual(shelf.Length, shelfsize, "Shelf length");
+            Assert.AreEqual(shelf[0], null, "Shelf0");
+            Assert.AreEqual(shelf[1].Name, "Testbottle1", "Shelf1");
+            Assert.AreEqual(shelf[2].Name, "Testbottle2", "Shelf2");
+            Assert.AreEqual(shelf[3].Name, "Testbottle3", "Shelf3");
+            Assert.AreEqual(shelf[4].Name, "Testbottle4", "Shelf4");
+            Assert.AreEqual(shelf[5], null, "Shelf5");
+            Assert.AreEqual(shelf[6].Name, "Testbottle6", "Shelf6");
+            Assert.AreEqual(shelf[7].Name, "Testbottle7", "Shelf7");
+            Assert.AreEqual(shelf[8].Name, "Testbottle8", "Shelf8");
+            Assert.AreEqual(shelf[9], null, "Shelf9");
+
+        }
         [TestMethod]
         public void TestPortion()
         {
             Bottle justABottle = new Bottle("something");
             Portion invalidPortion = new Portion(justABottle, 0);
-            Assert.IsFalse(invalidPortion.IsValid());
+            Assert.IsFalse(invalidPortion.IsValid(), "Invalid portion 1");
             invalidPortion.Bottle.Name = "";
-            invalidPortion.Amount = 10;
-            Assert.IsFalse(invalidPortion.IsValid());
-
+            invalidPortion.Amount = 2;
+            Assert.IsFalse(invalidPortion.IsValid(), "Invalid portion 2");
+            justABottle.Name = "something";
             Portion validPortion = new Portion(justABottle, 2);
-            Assert.IsTrue(validPortion.IsValid());
+            Assert.IsTrue(validPortion.IsValid(), "Valid portion 1");
 
 
         }
@@ -48,17 +87,23 @@ namespace RobotService
             justAOrder = new Order(OrderType.Drink, 2, justADrink);
             Assert.AreEqual(Order.GetRecipe(), justADrink, "Getrecipe");
 
-
+            justADrink.AddPortion(new Portion(new Bottle("b"), 10));
+            Assert.IsFalse(justADrink.RemovePortion("c"));
+            Assert.AreEqual(justADrink.Portions().Count, 2);
+            Assert.IsTrue(justADrink.RemovePortion("b"));
+            Assert.AreEqual(justADrink.Portions().Count, 1);
+            Assert.IsTrue(justADrink.RemovePortion("a"));
+            Assert.AreEqual(justADrink.Portions().Count, 0);
         }
         [TestMethod]
         public void TestClasses()
         {
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < shelfsize; i++)
             {
                 _bottleshelf.Add(new Bottle("Bottle" + i));
                 Assert.AreEqual(_bottleshelf.Count, i + 1, "Bottle" + i);
             }
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < shelfsize; i++)
             {
                 _drinkdb.Add(new Drink("Testdrink" + i));
                 for (var index = 0; index < _bottleshelf.Count; index++)
@@ -76,6 +121,7 @@ namespace RobotService
 
                 }
             }
+
             for (var i = 0; i < _bottleshelf.Count; ++i)
             {
                 Assert.AreEqual(_drinkdb[i].Name, "Testdrink" + i, $"Drinkname {_drinkdb[i].Name}");
