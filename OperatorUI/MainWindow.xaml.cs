@@ -32,7 +32,10 @@ namespace OperatorUI
             var connTask = RobotServiceConnection.Run(_cts.Token);
 
             DataContext = _viewModel;
+            _viewModel.InitializeLayoutImage(this);
         }
+
+        
 
         ~MainWindow()
         {
