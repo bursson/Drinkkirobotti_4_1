@@ -58,6 +58,10 @@
       <Project>{00dbae2e-596f-4501-8e80-e312ce787439}</Project>
       <Name>Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DataAccess\DataAccess.csproj">
+      <Project>{e102c0f2-96e7-4f6e-8ee3-d27752bdb7d9}</Project>
+      <Name>DataAccess</Name>
+    </ProjectReference>
     <ProjectReference Include="..\LogicLayer\LogicLayer.csproj">
       <Project>{fa25098f-36c1-4565-96fc-434f63cf08e7}</Project>
       <Name>LogicLayer</Name>

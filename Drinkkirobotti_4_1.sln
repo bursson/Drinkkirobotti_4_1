@@ -17,12 +17,19 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OperatorUI", "OperatorUI\OperatorUI.csproj", "{8783F2C0-2384-41B0-B7F4-6FE86B576530}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{A7854A0D-042A-43FF-8A0A-1E56CA12B217}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E102C0F2-96E7-4F6E-8EE3-D27752BDB7D9} = {E102C0F2-96E7-4F6E-8EE3-D27752BDB7D9}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\DataAccess.csproj", "{E102C0F2-96E7-4F6E-8EE3-D27752BDB7D9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceLayer", "ServiceLayer\ServiceLayer.csproj", "{5C636DD7-2E28-4CA2-8599-73D703FDADF1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogicLayer", "LogicLayer\LogicLayer.csproj", "{FA25098F-36C1-4565-96FC-434F63CF08E7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B9889C36-B067-4395-9561-309D37B6EA81} = {B9889C36-B067-4395-9561-309D37B6EA81}
+		{5C636DD7-2E28-4CA2-8599-73D703FDADF1} = {5C636DD7-2E28-4CA2-8599-73D703FDADF1}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotCellLayer", "RobotCellLayer\RobotCellLayer.csproj", "{B9889C36-B067-4395-9561-309D37B6EA81}"
 EndProject

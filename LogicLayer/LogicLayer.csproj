@@ -61,10 +61,6 @@
       <Project>{e102c0f2-96e7-4f6e-8ee3-d27752bdb7d9}</Project>
       <Name>DataAccess</Name>
     </ProjectReference>
-    <ProjectReference Include="..\OperatorUI\OperatorUI.csproj">
-      <Project>{8783f2c0-2384-41b0-b7f4-6fe86b576530}</Project>
-      <Name>OperatorUI</Name>
-    </ProjectReference>
     <ProjectReference Include="..\RobotCellLayer\RobotCellLayer.csproj">
       <Project>{b9889c36-b067-4395-9561-309d37b6ea81}</Project>
       <Name>RobotCellLayer</Name>
