@@ -1,9 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.AccessControl;
 using Common;
 
 namespace LogicLayer
 {
+    public class Activity
+    {
+        public string Data { get; private set; }
+        public ActivityType Type { get; private set; }
+        public Activity(ActivityType activityType, string data = null)
+        {
+            if (data != null)
+            {
+                Data = data;
+            }
+
+            Type = activityType;
+
+        }
+
+       
+    }
     public class Bottle
     {
         public Bottle(string bottleName, int maxvolume = 100, int volume = 100, bool isalcoholic = true, int pourspeed = 1) 
