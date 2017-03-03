@@ -3,6 +3,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using NLog;
 using Common;
+using CommService = ServiceLayer.ServiceLayer; // Set custom names for the classes to make the code less filled with dots.
+using RobotCell = RobotCellLayer.RobotCellLayer; //
+using DA = DataAccess.DataAccess; //
 
 namespace LogicLayer
 {
@@ -10,11 +13,17 @@ namespace LogicLayer
     {
         private static Logger Log = LogManager.GetCurrentClassLogger();
 
-        private readonly ServiceLayer.ServiceLayer _service;
-        private readonly RobotCellLayer.RobotCellLayer _robot;
-        private readonly DataAccess.DataAccess _da;
+        private readonly CommService _service; // ServiceLayer.
+        private readonly RobotCell _robot; // RobotCellLayer
+        private readonly DA _da; // DataAccess.
 
-        public LogicLayer(ServiceLayer.ServiceLayer sl, RobotCellLayer.RobotCellLayer r, DataAccess.DataAccess da)
+        /// <summary>
+        /// Creates a new LogicLayer.
+        /// </summary>
+        /// <param name="sl">ServiceLayer component.</param>
+        /// <param name="r">RobotCellLayer component.</param>
+        /// <param name="da">DataAccess component.</param>
+        public LogicLayer(CommService sl, RobotCell r, DA da)
         {
             const string fName = nameof(LogicLayer);
             Log.DebugEx(fName, "Construction BusinessLogic layer..");
