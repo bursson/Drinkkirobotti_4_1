@@ -6,4 +6,10 @@
         Sparkling,
         Beer
     }
+
+    public enum RunMode
+    {
+        Simulation,
+        Production
+    }
 }
