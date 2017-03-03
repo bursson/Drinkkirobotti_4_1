@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using NLog;
 using Common;
-using System.Threading.Tasks;
-using ServiceLayer;
 
 namespace LogicLayer
 {
@@ -26,24 +23,42 @@ namespace LogicLayer
             _da = da;
         }
 
-        public bool Initialize(StartArguments args)
+        public async Task<bool> Initialize(StartArguments args, CancellationToken ct)
         {
+            bool result = Convert.ToBoolean(new Random(Convert.ToInt32(DateTime.Now.Second))); // lul.
+            string errorMsg = string.Empty;
+            const string fName = nameof(Initialize);
+            Log.InfoEx(fName, "Initializing LogicLayer");
             // TODO: Set settings from given arguments.
-            // And return based on that.
-            return true;
+            // And set result based on that.
+            if (result)
+            {
+                Log.InfoEx(fName, "Initialized LogicLayer successfully");
+                return true;
+            }
+            else
+            {
+                Log.ErrorEx(fName,$"Initializing LogicLayer failed:{Environment.NewLine}{errorMsg}");
+                return false;
+            }
         }
 
+        public async Task Run(CancellationToken ct)
+        {
+            // TODO: Implement logic loop here with tons of private functions.
+        }
         public void Dispose()
         {
-            throw new NotImplementedException();
+            const string fName = nameof(Dispose);
+            Log.InfoEx(fName, "Disposing LogicLayer");
+            // TODO Dispose stuff here if needed, serialConnections etc.
         }
     }
 
     public class StartArguments
     {
-        // TODO:
+        // TODO: Write required starting arguments here.
         public RunMode Mode { get; private set; }
-        
     }
 
 
