@@ -12,7 +12,7 @@ namespace LogicLayer
             if (priority < 0) throw new ArgumentOutOfRangeException(nameof(priority));
             for (int i = 0; i < Count; i++)
             {
-                if (this[i].Item1.GetId() == neworder.GetId())
+                if (this[i].Item1.OrderId == neworder.OrderId)
                 {
                     return false;
                 }
@@ -31,7 +31,7 @@ namespace LogicLayer
                 {
                     result = this[i];
                     maxpriority = this[i].Item2;
-                }else if (this[i].Item2 == maxpriority && result != null && result.Item1.GetId() > this[i].Item1.GetId())
+                }else if (this[i].Item2 == maxpriority && result != null && result.Item1.OrderId > this[i].Item1.OrderId)
                 {
                     result = this[i];
                 }

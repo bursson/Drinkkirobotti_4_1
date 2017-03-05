@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.AccessControl;
+using SQLite;
 
 namespace Common
 {
@@ -38,7 +39,7 @@ namespace Common
         }
 
         [PrimaryKey, AutoIncrement]
-        public int Id { get; set; }
+        public int BottleId { get; set; }
 
         public string Name { get; set; }
         public int MaxVolume { get; private set; }
@@ -69,7 +70,7 @@ namespace Common
             this.Bottle = bottle;
             this.Amount = amount;
         }
-
+        
         /// <summary>
         /// Check if the portion is valid
         /// </summary>
@@ -83,6 +84,9 @@ namespace Common
     {
         private readonly List<Portion> _portions;
         public string Name { get; set; }
+
+        [PrimaryKey, AutoIncrement]
+        public int DrinkId { get; set; }
 
         public Drink(string name)
         {
@@ -141,7 +145,6 @@ namespace Common
     public class Order
     {
         private readonly OrderType _orderType;
-        private readonly int _id;
         private Drink _drink;
 
         /// <summary>
@@ -153,14 +156,13 @@ namespace Common
         public Order(OrderType orderType, int id, Drink drink = null)
         {
             _orderType = orderType;
-            _id = id;
             _drink = drink;
         }
         
-        public int GetId()
-        {
-            return _id;
-        }
+        [PrimaryKey, AutoIncrement]
+        public int OrderId { get; set; }
+
+        public int DrinkId { get; set; }
 
         public OrderType GetOrderType()
         {
@@ -297,105 +299,4 @@ namespace Common
 
 
     }
-
-
-    #region Attributes
-    [AttributeUsage(AttributeTargets.Class)]
-    public class TableAttribute : Attribute
-    {
-        public string Name { get; set; }
-
-        public TableAttribute(string name)
-        {
-            Name = name;
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Property)]
-    public class ColumnAttribute : Attribute
-    {
-        public string Name { get; set; }
-
-        public ColumnAttribute(string name)
-        {
-            Name = name;
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Property)]
-    public class PrimaryKeyAttribute : Attribute
-    {
-    }
-
-    [AttributeUsage(AttributeTargets.Property)]
-    public class AutoIncrementAttribute : Attribute
-    {
-    }
-
-    [AttributeUsage(AttributeTargets.Property)]
-    public class IndexedAttribute : Attribute
-    {
-        public string Name { get; set; }
-        public int Order { get; set; }
-        public virtual bool Unique { get; set; }
-
-        public IndexedAttribute()
-        {
-        }
-
-        public IndexedAttribute(string name, int order)
-        {
-            Name = name;
-            Order = order;
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Property)]
-    public class IgnoreAttribute : Attribute
-    {
-    }
-
-    [AttributeUsage(AttributeTargets.Property)]
-    public class UniqueAttribute : IndexedAttribute
-    {
-        public override bool Unique
-        {
-            get { return true; }
-            set { /* throw?  */ }
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Property)]
-    public class MaxLengthAttribute : Attribute
-    {
-        public int Value { get; private set; }
-
-        public MaxLengthAttribute(int length)
-        {
-            Value = length;
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Property)]
-    public class CollationAttribute : Attribute
-    {
-        public string Value { get; private set; }
-
-        public CollationAttribute(string collation)
-        {
-            Value = collation;
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Property)]
-    public class NotNullAttribute : Attribute
-    {
-    }
-
-    [AttributeUsage(AttributeTargets.Enum)]
-    public class StoreAsTextAttribute : Attribute
-    {
-    }
-
-#endregion
 }

@@ -88,7 +88,7 @@ namespace UnitTests
         {
             var justADrink = new Drink("some");
             var justAOrder = new Order(OrderType.Drink, 1, justADrink);
-            Assert.AreEqual(justAOrder.GetId(), 1, "OrderID");
+            Assert.AreEqual(justAOrder.OrderId, 1, "OrderID");
             Assert.AreEqual(justAOrder.GetOrderType(), OrderType.Drink, "Ordertype");
             justADrink.AddPortion(new Portion(new Bottle("a"), 3));
             justAOrder = new Order(OrderType.Drink, 2, justADrink);
@@ -164,7 +164,7 @@ namespace UnitTests
             }
             for (int i = 0; i < 20; i++)
             {
-                Assert.AreEqual(i, _queue.Pop().GetId());
+                Assert.AreEqual(i, _queue.Pop().OrderId);
             }
             Assert.IsNull(_queue.Pop());
 
