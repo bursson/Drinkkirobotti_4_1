@@ -21,7 +21,7 @@ namespace DataAccess
 
         public static async Task InitializeDB()
         {
-            var connection = new SQLiteAsyncConnection("test");
+            var connection = new SQLiteAsyncConnection("test.db");
 
             await connection.CreateTableAsync<Stock>();
 
