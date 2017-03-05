@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Client.cs" />
+    <Compile Include="DataTypes.cs" />
     <Compile Include="Enum.cs" />
     <Compile Include="Exceptions.cs" />
     <Compile Include="NLogExtensions.cs" />
