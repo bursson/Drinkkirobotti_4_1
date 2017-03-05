@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Common;
 using NLog;
+using SQLite;
 
 namespace DataAccess
 {
@@ -33,7 +34,7 @@ namespace DataAccess
             Log.InfoEx(nameof(InitializeDB), "No database found, initializing:");
 
             // If database doesnt exist, create entities etc
-            var db = new SQLiteAsyncConnection(DatabaseInformation.DATABASE_NAME);
+            var db = new SQLiteAsyncConnection(DatabaseInformation.DATABASE_NAME); // TODO: Is not disposable :(?
 
             // TODO: transform to generic foreach iteration for all DataTypes items
             // For example with reflection
@@ -48,15 +49,17 @@ namespace DataAccess
         {
             // File exists
             if (!File.Exists(DatabaseInformation.DATABASE_NAME)) return false;
-            var db = new SQLiteConnection(DatabaseInformation.DATABASE_NAME);
 
-            // Entity tables exists
-            // TODO: generic foreach
-            var tb1 = db.GetTableInfo("BottleShelf");
-            var tb2 = db.GetTableInfo("Bottle");
-            if (tb1.Count == 0 || tb2.Count == 0) return false;
+            using (var db = new SQLiteConnection(DatabaseInformation.DATABASE_NAME))
+            {
+                // Entity tables exists
+                // TODO: generic foreach
+                var tb1 = db.GetTableInfo("BottleShelf");
+                var tb2 = db.GetTableInfo("Bottle");
+                if (tb1.Count == 0 || tb2.Count == 0) return false;
 
-            return true;
+                return true;
+            }
         }
 
         public static async Task AddAnotherJalluToDBTest()
