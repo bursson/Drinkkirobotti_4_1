@@ -20,39 +20,6 @@ namespace DataAccess
         {
            _service = serviceLayer;
         }
-
-        public static async Task InitializeDB()
-        {
-            if(await isDBExists()) return;
-
-            // If database doesnt exist, create entities etc
-            var db = new SQLiteAsyncConnection(DatabaseInformation.DATABASE_NAME);
-            await db.CreateTableAsync<TestTable>();
-
-            Log.InfoEx(nameof(InitializeDB), "Table created");
-
-            TestTable testTable = new TestTable()
-            {
-                Content = "Im a test insert. Try to query me!"
-            };
-
-            await db.InsertAsync(testTable);
-            Log.InfoEx(nameof(InitializeDB), "New customer ID: " + testTable.Id);
-        }
-
-        private static async Task<bool> isDBExists()
-        {
-            // File exists
-            if (!File.Exists(DatabaseInformation.DATABASE_NAME)) return false;
-            var db = new SQLiteAsyncConnection(DatabaseInformation.DATABASE_NAME);
-
-            // Entity tables exists
-            // TODO:
-            var tb1 = await db.Table<TestTable>().ToListAsync();
-            if (tb1.Count == 0) return false;
-
-            return true;
-        }
     }
 
     public static class DatabaseInformation
