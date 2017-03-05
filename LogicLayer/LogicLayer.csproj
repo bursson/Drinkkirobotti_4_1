@@ -44,7 +44,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataTypes.cs" />
     <Compile Include="LogicLayer.cs" />
     <Compile Include="PriorityQueues.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.AccessControl;
-using Common;
-using DataAccess;
+using SQLite;
 
-namespace LogicLayer
+namespace Common
 {
     public class Activity
     {
@@ -40,7 +39,7 @@ namespace LogicLayer
         }
 
         [PrimaryKey, AutoIncrement]
-        public int Id { get; set; }
+        public int BottleId { get; set; }
 
         public string Name { get; set; }
         public int MaxVolume { get; private set; }
@@ -71,7 +70,7 @@ namespace LogicLayer
             this.Bottle = bottle;
             this.Amount = amount;
         }
-
+        
         /// <summary>
         /// Check if the portion is valid
         /// </summary>
@@ -85,6 +84,9 @@ namespace LogicLayer
     {
         private readonly List<Portion> _portions;
         public string Name { get; set; }
+
+        [PrimaryKey, AutoIncrement]
+        public int DrinkId { get; set; }
 
         public Drink(string name)
         {
@@ -143,7 +145,6 @@ namespace LogicLayer
     public class Order
     {
         private readonly OrderType _orderType;
-        private readonly int _id;
         private Drink _drink;
 
         /// <summary>
@@ -155,14 +156,13 @@ namespace LogicLayer
         public Order(OrderType orderType, int id, Drink drink = null)
         {
             _orderType = orderType;
-            _id = id;
             _drink = drink;
         }
         
-        public int GetId()
-        {
-            return _id;
-        }
+        [PrimaryKey, AutoIncrement]
+        public int OrderId { get; set; }
+
+        public int DrinkId { get; set; }
 
         public OrderType GetOrderType()
         {
