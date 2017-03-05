@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Security.AccessControl;
 using Common;
+using DataAccess;
 
 namespace LogicLayer
 {
@@ -32,6 +33,14 @@ namespace LogicLayer
             IsAlcoholic = isalcoholic;
             PourSpeed = pourspeed;
         }
+
+        // For sql
+        public Bottle()
+        {
+        }
+
+        [PrimaryKey, AutoIncrement]
+        public int Id { get; set; }
 
         public string Name { get; set; }
         public int MaxVolume { get; private set; }
@@ -179,6 +188,15 @@ namespace LogicLayer
         {
             Shelf = new Bottle[size];
         }
+
+        // For sql
+        public Bottleshelf()
+        {
+            
+        }
+
+        [PrimaryKey, AutoIncrement]
+        public int Id { get; set; }
 
         /// <summary>
         /// Add a bottle to the shelf
