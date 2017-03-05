@@ -40,6 +40,8 @@ namespace RobotService
         private static async Task MainLogic(CancellationToken ct)
         {
             // Main logic here
+            await DataAccess.DataAccess.InitializeDB();
+
             var operatorTask = OperatorConnection.Run(ct);
             var delayTask = Task.Delay(-1, ct);
             // Test.
@@ -47,6 +49,7 @@ namespace RobotService
 
             var done = await Task.WhenAny(operatorTask, delayTask);
             ct.ThrowIfCancellationRequested();
+
         }
     }
 }
