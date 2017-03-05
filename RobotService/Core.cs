@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Common;
+using DataAccess;
 using NLog;
 using ServiceLayer;
 using BusinessLogic = LogicLayer.LogicLayer;
@@ -41,6 +42,7 @@ namespace RobotService
         {
             // Main logic here
             await DataAccess.DataAccess.InitializeDB();
+            await AddBottleToDBTest();
 
             var operatorTask = OperatorConnection.Run(ct);
             var delayTask = Task.Delay(-1, ct);
@@ -50,6 +52,13 @@ namespace RobotService
             var done = await Task.WhenAny(operatorTask, delayTask);
             ct.ThrowIfCancellationRequested();
 
+        }
+
+        private static async Task AddBottleToDBTest()
+        {
+            var db = new SQLiteAsyncConnection(DatabaseInformation.DATABASE_NAME);
+            //await db.CreateTableAsync<Bottle>();
+            
         }
     }
 }
