@@ -73,6 +73,7 @@ namespace Common
             get { return _connectionStatus; }
             set
             {
+                if (_connectionStatus == value) return;
                 _connectionStatus = value;
                 ConnectionStatusChanged?.Invoke(_connectionStatus);
             }
