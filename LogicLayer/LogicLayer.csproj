@@ -44,7 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataTypes.cs" />
+    <Compile Include="LogicLayer.cs" />
     <Compile Include="PriorityQueues.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -55,6 +55,18 @@
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{00DBAE2E-596F-4501-8E80-E312CE787439}</Project>
       <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataAccess\DataAccess.csproj">
+      <Project>{e102c0f2-96e7-4f6e-8ee3-d27752bdb7d9}</Project>
+      <Name>DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RobotCellLayer\RobotCellLayer.csproj">
+      <Project>{b9889c36-b067-4395-9561-309d37b6ea81}</Project>
+      <Name>RobotCellLayer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ServiceLayer\ServiceLayer.csproj">
+      <Project>{5c636dd7-2e28-4ca2-8599-73d703fdadf1}</Project>
+      <Name>ServiceLayer</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

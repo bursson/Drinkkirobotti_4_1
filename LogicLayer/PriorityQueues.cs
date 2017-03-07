@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Common;
 
 namespace LogicLayer
 {
@@ -8,9 +9,10 @@ namespace LogicLayer
         public bool Add(Order neworder, int priority)
         {
             if (neworder == null) throw new ArgumentNullException(nameof(neworder));
-            for (int i = 0; i < this.Count; i++)
+            if (priority < 0) throw new ArgumentOutOfRangeException(nameof(priority));
+            for (int i = 0; i < Count; i++)
             {
-                if (this[i].Item1.GetId() == neworder.GetId())
+                if (this[i].Item1.OrderId == neworder.OrderId)
                 {
                     return false;
                 }
@@ -23,19 +25,63 @@ namespace LogicLayer
         {
             var maxpriority = -1;
             Tuple<Order, int> result = null;
-            for (int i = 0; i < this.Count; i++)
+            for (int i = 0; i < Count; i++)
             {
                 if (this[i].Item2 > maxpriority)
                 {
                     result = this[i];
                     maxpriority = this[i].Item2;
-                }else if (this[i].Item2 == maxpriority && result != null && result.Item1.GetId() > this[i].Item1.GetId())
+                }else if (this[i].Item2 == maxpriority && result != null && result.Item1.OrderId > this[i].Item1.OrderId)
                 {
                     result = this[i];
                 }
             }
             if (result == null) return null;
-            this.Remove(result);
+            Remove(result);
+            return result.Item1;
+        }
+    }
+
+    /// <summary>
+    /// Class for storing what kind of activities should be done
+    /// </summary>
+    public class ActivityQueue : List<Tuple<Activity, int>>
+    {
+        public Activity DefaultActivity { get; private set; }
+        /// <summary>
+        /// Construct a new Activity Queue
+        /// </summary>
+        /// <param name="defaultActivity">What should be done if the queue is empty</param>
+        public ActivityQueue(Activity defaultActivity)
+        {
+            DefaultActivity = defaultActivity;
+        }
+        public bool Add(Activity newaction, int priority)
+        {
+            if (priority < 0) throw new ArgumentOutOfRangeException(nameof(priority));
+            if (newaction == null) throw new ArgumentNullException(nameof(newaction));
+            for (int i = 0; i < Count; i++)
+            {
+                if (this[i].Item1.Type != newaction.Type || this[i].Item1.Data != newaction.Data) continue;
+                if (this[i].Item2 == priority) return false;
+            }
+            Add(new Tuple<Activity, int>(newaction, priority));
+            return true;
+        }
+
+        public Activity Pop()
+        {
+            var maxpriority = -1;
+            Tuple<Activity,int> result = null;
+            for (int i = 0; i < Count; i++)
+            {
+                if (this[i].Item2 <= maxpriority) continue;
+                result = this[i];
+                maxpriority = this[i].Item2;
+            }
+
+            if (result == null) return DefaultActivity;
+            Remove(result);
             return result.Item1;
         }
     }

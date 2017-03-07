@@ -19,6 +19,7 @@ namespace UnitTests
         private List<Drink> _drinkdb;
         private Bottleshelf _bs;
         private OrderQueue _queue;
+        private ActivityQueue _activity;
              
         private int shelfsize = 10;
 
@@ -29,6 +30,7 @@ namespace UnitTests
             _drinkdb = new List<Drink>();
             _bs = new Bottleshelf(shelfsize);
             _queue = new OrderQueue();
+            _activity = new ActivityQueue(new Activity(ActivityType.Idle));
         }
 
         [TestMethod]
@@ -86,7 +88,7 @@ namespace UnitTests
         {
             var justADrink = new Drink("some");
             var justAOrder = new Order(OrderType.Drink, 1, justADrink);
-            Assert.AreEqual(justAOrder.GetId(), 1, "OrderID");
+            Assert.AreEqual(justAOrder.OrderId, 1, "OrderID");
             Assert.AreEqual(justAOrder.GetOrderType(), OrderType.Drink, "Ordertype");
             justADrink.AddPortion(new Portion(new Bottle("a"), 3));
             justAOrder = new Order(OrderType.Drink, 2, justADrink);
@@ -162,9 +164,79 @@ namespace UnitTests
             }
             for (int i = 0; i < 20; i++)
             {
-                Assert.AreEqual(i, _queue.Pop().GetId());
+                Assert.AreEqual(i, _queue.Pop().OrderId);
             }
             Assert.IsNull(_queue.Pop());
+
+            try
+            {
+                _queue.Add(new Order(OrderType.Beer, 2), -1);
+                Assert.Fail("Expected a ArgumentOutOfRangeException");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+
+            }
+        }
+
+
+        [TestMethod]
+        public void Activityqueue()
+        {
+            Assert.IsTrue(_activity.Add(new Activity(ActivityType.ProcessOrders), 10));
+            Assert.IsTrue(_activity.Add(new Activity(ActivityType.ProcessOrders), 11));
+            Assert.IsTrue(_activity.Add(new Activity(ActivityType.ProcessOrders), 12));
+            Assert.IsTrue(_activity.Add(new Activity(ActivityType.Idle), 10));
+            Assert.IsFalse(_activity.Add(new Activity(ActivityType.ProcessOrders), 10));
+            Assert.IsTrue(_activity.Add(new Activity(ActivityType.Macro, "asd"), 10));
+        
+            Assert.AreEqual(ActivityType.ProcessOrders, _activity.Pop().Type);
+            Assert.AreEqual(ActivityType.ProcessOrders, _activity.Pop().Type);
+            Assert.AreEqual(ActivityType.ProcessOrders, _activity.Pop().Type);
+            Assert.AreEqual(ActivityType.Idle, _activity.Pop().Type);
+            Assert.AreEqual(ActivityType.Macro, _activity.Pop().Type);
+            Assert.AreEqual(0, _activity.Count);
+
+            _activity = new ActivityQueue(new Activity(ActivityType.Macro, "testing"));
+            Assert.AreEqual("testing", _activity.Pop().Data);
+            Assert.AreEqual("testing", _activity.Pop().Data);
+            Assert.AreEqual(ActivityType.Macro, _activity.Pop().Type);
+
+            Assert.IsTrue(_activity.Add(new Activity(ActivityType.ProcessOrders), 10));
+            Assert.IsTrue(_activity.Add(new Activity(ActivityType.ProcessOrders), 20));
+            Assert.IsTrue(_activity.Add(new Activity(ActivityType.ProcessOrders), 1000));
+            Assert.IsTrue(_activity.Add(new Activity(ActivityType.ProcessOrders), 0));
+            Assert.IsTrue(_activity.Add(new Activity(ActivityType.Macro, "first"), 15));
+            Assert.IsTrue(_activity.Add(new Activity(ActivityType.Macro, "second"), 100));
+            Assert.IsTrue(_activity.Add(new Activity(ActivityType.Idle), 100));
+
+            Assert.AreEqual(7, _activity.Count);
+
+            Assert.AreEqual(ActivityType.ProcessOrders, _activity.Pop().Type);
+            Assert.AreEqual("second", _activity.Pop().Data);
+            Assert.AreEqual(ActivityType.Idle, _activity.Pop().Type);
+            Assert.AreEqual(ActivityType.ProcessOrders, _activity.Pop().Type);
+            Assert.AreEqual("first", _activity.Pop().Data);
+            Assert.AreEqual(ActivityType.ProcessOrders, _activity.Pop().Type);
+            Assert.AreEqual(ActivityType.ProcessOrders, _activity.Pop().Type);
+            Assert.AreEqual(0, _activity.Count);
+            Assert.AreEqual("testing", _activity.Pop().Data);
+            Assert.AreEqual("testing", _activity.Pop().Data);
+            Assert.AreEqual("testing", _activity.Pop().Data);
+
+            try
+            {
+                _activity.Add(new Activity(ActivityType.Idle), -5);
+                Assert.Fail("Expected a ArgumentOutOfRangeException");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                
+            }
+
+
+
+
         }
     }
 }

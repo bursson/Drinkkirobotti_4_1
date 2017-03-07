@@ -1,9 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
-using Common;
+using System.Security.AccessControl;
+using SQLite;
 
-namespace LogicLayer
+namespace Common
 {
+    public class Activity
+    {
+        public string Data { get; private set; }
+        public ActivityType Type { get; private set; }
+        public Activity(ActivityType activityType, string data = null)
+        {
+            if (data != null)
+            {
+                Data = data;
+            }
+
+            Type = activityType;
+
+        }
+
+       
+    }
     public class Bottle
     {
         public Bottle(string bottleName, int maxvolume = 100, int volume = 100, bool isalcoholic = true, int pourspeed = 1) 
@@ -14,6 +32,14 @@ namespace LogicLayer
             IsAlcoholic = isalcoholic;
             PourSpeed = pourspeed;
         }
+
+        // For sql
+        public Bottle()
+        {
+        }
+
+        [PrimaryKey, AutoIncrement]
+        public int BottleId { get; set; }
 
         public string Name { get; set; }
         public int MaxVolume { get; private set; }
@@ -44,7 +70,7 @@ namespace LogicLayer
             this.Bottle = bottle;
             this.Amount = amount;
         }
-
+        
         /// <summary>
         /// Check if the portion is valid
         /// </summary>
@@ -58,6 +84,9 @@ namespace LogicLayer
     {
         private readonly List<Portion> _portions;
         public string Name { get; set; }
+
+        [PrimaryKey, AutoIncrement]
+        public int DrinkId { get; set; }
 
         public Drink(string name)
         {
@@ -116,7 +145,6 @@ namespace LogicLayer
     public class Order
     {
         private readonly OrderType _orderType;
-        private readonly int _id;
         private Drink _drink;
 
         /// <summary>
@@ -128,14 +156,13 @@ namespace LogicLayer
         public Order(OrderType orderType, int id, Drink drink = null)
         {
             _orderType = orderType;
-            _id = id;
             _drink = drink;
         }
         
-        public int GetId()
-        {
-            return _id;
-        }
+        [PrimaryKey, AutoIncrement]
+        public int OrderId { get; set; }
+
+        public int DrinkId { get; set; }
 
         public OrderType GetOrderType()
         {
@@ -161,6 +188,15 @@ namespace LogicLayer
         {
             Shelf = new Bottle[size];
         }
+
+        // For sql
+        public Bottleshelf()
+        {
+            
+        }
+
+        [PrimaryKey, AutoIncrement]
+        public int Id { get; set; }
 
         /// <summary>
         /// Add a bottle to the shelf
