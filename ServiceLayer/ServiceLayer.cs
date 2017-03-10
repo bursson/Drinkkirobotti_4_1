@@ -9,22 +9,22 @@ namespace ServiceLayer
 {
     public class ServiceLayer
     {
-        public async Task<Data> ReadDataAsync(CancellationToken ct)
+        public async Task<MessageData> ReadDataAsync(CancellationToken ct)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<Config> ReadConfigAsync(CancellationToken ct)
+        public async Task<MessageConfig> ReadConfigAsync(CancellationToken ct)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<bool> WriteAsync(CancellationToken ct, Data data)
+        public async Task<bool> WriteAsync(CancellationToken ct, MessageData data)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<bool> WriteAsync(CancellationToken ct, Config config)
+        public async Task<bool> WriteAsync(CancellationToken ct, MessageConfig config)
         {
             throw new NotImplementedException();
         }

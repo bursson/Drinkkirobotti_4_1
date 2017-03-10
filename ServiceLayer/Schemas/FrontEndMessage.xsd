@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="FrontEndMessage"
+    targetNamespace="http://tempuri.org/RobotService/FrontEndMessage"
+    elementFormDefault="qualified"
+    xmlns="http://tempuri.org/RobotService/FrontEndMessage"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+  <xs:element name="Message">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Header">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="MessageType" type="xs:string"/> <!--Acknowledgment? OrderRequest etc?-->
+              <xs:element name="MessageContent" type="xs:string"/> <!--Use this to determine the type of the following element. data/config etc.-->
+              <!-- Possible additional header information here -->
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:choice>
+          <xs:element name="Data">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="DummyDataElement" type="xs:string"/>
+                <!-- Data elements here.-->
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="Config">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="DummyConfigElement" type="xs:string"/>
+                <!--config elements here. -->
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+
