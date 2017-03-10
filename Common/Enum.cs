@@ -20,4 +20,20 @@
         Simulation,
         Production
     }
+
+    public enum State
+    {
+        Initialize,
+        InitFailure,
+        Idle,
+        IdleDemo,
+        GrabBottle,
+        GetNewBottle,
+        ReturnBottle,
+        RemoveBottle,
+        DisposeBeer,
+        PourDrinks,
+        PourBeer,
+        PourSparkling
+    }
 }
