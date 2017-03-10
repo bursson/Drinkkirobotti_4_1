@@ -272,6 +272,18 @@ namespace Common
             return null;
         }
 
+        public int Find(int id)
+        {
+            for (int i = 0; i < Size(); i++)
+            {
+                if (Shelf[i] != null && Shelf[i].BottleId == id)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
         /// <summary>
         /// Get the size of the shelf
         /// </summary>
