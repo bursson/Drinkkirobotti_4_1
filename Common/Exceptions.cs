@@ -15,4 +15,9 @@ namespace Common
 
         public override string Message => $"Portname {_portname}: {_message}";
     }
+
+    public class StateViolationException : Exception
+    {
+        
+    }
 }
