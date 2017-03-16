@@ -59,6 +59,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="IOperatorLogger.cs" />
+    <Compile Include="LogOutput.cs" />
     <Compile Include="RobotServiceConnection.cs" />
     <Compile Include="ViewModel.cs" />
     <Page Include="MainWindow.xaml">

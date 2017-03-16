@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -8,8 +10,13 @@ using System.Windows.Shapes;
 
 namespace OperatorUI
 {
-    public sealed class ViewModel : INotifyPropertyChanged
+    public sealed class ViewModel : INotifyPropertyChanged, IOperatorLogger
     {
+        public ViewModel()
+        {
+            LogOutputs = new ObservableCollection<LogOutput>();
+        }
+
         private int _counter;
 
         public int Counter
@@ -19,9 +26,18 @@ namespace OperatorUI
             {
                 if (value == _counter) return;
                 _counter = value;
+                WriteLine(new LogOutput(value.ToString()));
                 OnPropertyChanged();
             }
         }
+        
+        public ObservableCollection<LogOutput> LogOutputs { get; set; }
+
+        public void WriteLine(LogOutput newOutput)
+        {
+            LogOutputs.Insert(0, newOutput);
+        }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
         
