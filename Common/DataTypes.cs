@@ -156,6 +156,7 @@ namespace Common
         public Order(OrderType orderType, int id, Drink drink = null)
         {
             _orderType = orderType;
+            OrderId = id;
             _drink = drink;
         }
         
