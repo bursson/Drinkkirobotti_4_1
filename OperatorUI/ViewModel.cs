@@ -26,14 +26,13 @@ namespace OperatorUI
             {
                 if (value == _counter) return;
                 _counter = value;
-                WriteLine(new LogOutput(value.ToString()));
                 OnPropertyChanged();
             }
         }
         
         public ObservableCollection<LogOutput> LogOutputs { get; set; }
 
-        public void WriteLine(LogOutput newOutput)
+        public void AddLogOutput(LogOutput newOutput)
         {
             LogOutputs.Insert(0, newOutput);
         }

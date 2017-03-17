@@ -12,7 +12,7 @@ namespace OperatorUI
     public static class RobotServiceConnection
     {
         public static event Action OnPong;
-        public static event Action<string> OnInfo;
+        public static event Action<string> OnLog;
 
         private static readonly Client Connection = new Client(IPAddress.Parse("127.0.0.1"), 7676, "\r\n", true, nameof(RobotServiceConnection));
 
@@ -48,10 +48,9 @@ namespace OperatorUI
             {
                 OnPong?.Invoke();
             }
-
-            if (msg.StartsWith("INFO", StringComparison.Ordinal))
+            else
             {
-                OnInfo?.Invoke(msg);
+                OnLog?.Invoke(msg);
             }
         }
     }

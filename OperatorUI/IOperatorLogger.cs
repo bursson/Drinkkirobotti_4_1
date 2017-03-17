@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace OperatorUI
 {
-    interface IOperatorLogger
+    public interface IOperatorLogger
     {
-        void WriteLine(LogOutput newOutput);
+        void AddLogOutput(LogOutput newOutput);
     }
 }

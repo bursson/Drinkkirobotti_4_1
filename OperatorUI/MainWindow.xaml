@@ -64,13 +64,25 @@
                       HeadersVisibility="Column"
                       SelectionUnit="FullRow">
                 <DataGrid.Columns>
+                    <DataGridTextColumn Header="Log level"
+                                        Binding="{Binding LogLevel}"
+                                        Width="50">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="VerticalAlignment"
+                                        Value="Center" />
+                                <Setter Property="Margin"
+                                        Value="5,0,0,0" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
                     <DataGridTextColumn Header="Message"
                                         Binding="{Binding Message}"
                                         Width="*">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="VerticalAlignment" Value="Center" />
-                                <Setter Property="Margin" Value="5,0,0,0"/>
+                                <Setter Property="Margin" Value="0,0,0,0"/>
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>

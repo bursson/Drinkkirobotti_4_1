@@ -29,7 +29,7 @@ namespace OperatorUI
         {
             InitializeComponent();
             RobotServiceConnection.OnPong += OnPong;
-            RobotServiceConnection.OnInfo += OnInfo;
+            RobotServiceConnection.OnLog += OnLog;
             var connTask = RobotServiceConnection.Run(_cts.Token);
 
             DataContext = _viewModel;
@@ -58,9 +58,33 @@ namespace OperatorUI
             ++_viewModel.Counter;
         }
 
-        private void OnInfo(string msg)
+        private void OnLog(string msg)
         {
-            _viewModel.WriteLine(new LogOutput(msg));
+            if (msg.StartsWith("TRACE", StringComparison.Ordinal))
+            {
+                _viewModel.AddLogOutput(new Trace(msg));
+            }
+            else if (msg.StartsWith("DEBUG", StringComparison.Ordinal))
+            {
+                _viewModel.AddLogOutput(new Debug(msg));
+            }
+            else if (msg.StartsWith("ERROR", StringComparison.Ordinal))
+            {
+                _viewModel.AddLogOutput(new Error(msg));
+            }
+            else if (msg.StartsWith("FATAL", StringComparison.Ordinal))
+            {
+                _viewModel.AddLogOutput(new Fatal(msg));
+            }
+            else if (msg.StartsWith("INFO", StringComparison.Ordinal))
+            {
+                _viewModel.AddLogOutput(new Info(msg));
+            }
+            else
+            {
+                return;
+            }
+
         }
     }
 }

@@ -16,24 +16,37 @@ namespace Common
         public static async Task TraceEx(this Logger log, string funcName, string message)
         {
             log.Trace("{0}|{1}",funcName,message);
-            var writeAsync = Connection?.WriteAsync($"TRACE {funcName}|{message}", CancellationToken.None);
+            await FormatMessageAndWriteASync("TRACE", funcName, message);
+        }
+
+        public static async Task DebugEx(this Logger log, string funcName, string message, bool willBeLoggedToUi = true)
+        {
+            log.Debug("{0}|{1}", funcName, message);
+            //TODO: debug - loop
+            if(!willBeLoggedToUi)
+            {
+                return;
+            }
+            var writeAsync = Connection?.WriteAsync($"DEBUG {funcName}|{message}", CancellationToken.None);
+            if (writeAsync != null)
+                await writeAsync;
+
+        }
+
+        public static async Task ErrorEx(this Logger log, string funcName, string message)
+        {
+            log.Error("{0}|{1}", funcName, message);
+            var writeAsync = Connection?.WriteAsync($"ERROR {funcName}|{message}", CancellationToken.None);
             if (writeAsync != null)
                 await writeAsync;
         }
 
-        public static void DebugEx(this Logger log, string funcName, string message)
-        {
-            log.Debug("{0}|{1}",funcName,message);
-        }
-
-        public static void ErrorEx(this Logger log, string funcName, string message)
-        {
-            log.Error("{0}|{1}", funcName, message);
-        }
-
-        public static void FatalEx(this Logger log, string funcName, string message)
+        public static async Task FatalEx(this Logger log, string funcName, string message)
         {
             log.Fatal("{0}|{1}", funcName, message);
+            var writeAsync = Connection?.WriteAsync($"FATAL {funcName}|{message}", CancellationToken.None);
+            if (writeAsync != null)
+                await writeAsync;
         }
         public static async Task InfoEx(this Logger log, string funcName, string message)
         {
@@ -48,6 +61,13 @@ namespace Common
             {
                 log.Error(e, "asd");
             }
+        }
+
+        private static async Task FormatMessageAndWriteASync(string level, string funcName, string message)
+        {
+            var writeAsync = Connection?.WriteAsync($"LOGMESSAGE;{level};{funcName};{message}", CancellationToken.None);
+            if (writeAsync != null)
+                await writeAsync;
         }
     }
 }

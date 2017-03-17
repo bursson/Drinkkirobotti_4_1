@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace OperatorUI
 {
-    public class LogOutput
+    public abstract class LogOutput
     {
-        public LogOutput(string message)
+        protected LogOutput(string message)
         {
             Message = message;
         }
@@ -16,5 +16,8 @@ namespace OperatorUI
         public string Message { get; set; }
 
         //TODO: add here log levels, timestamps etc
+        
+        public abstract string LogLevel { get; }
+
     }
 }
