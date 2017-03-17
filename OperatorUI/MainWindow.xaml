@@ -66,7 +66,7 @@
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Log level"
                                         Binding="{Binding LogLevel}"
-                                        Width="50">
+                                        Width="60">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="VerticalAlignment"
@@ -76,13 +76,27 @@
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
+                    <DataGridTextColumn Header="Time"
+                                        Binding="{Binding DateTime}"
+                                        Width="120">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="VerticalAlignment"
+                                        Value="Center" />
+                                <Setter Property="Margin"
+                                        Value="0,0,0,0" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
                     <DataGridTextColumn Header="Message"
                                         Binding="{Binding Message}"
                                         Width="*">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
-                                <Setter Property="VerticalAlignment" Value="Center" />
-                                <Setter Property="Margin" Value="0,0,0,0"/>
+                                <Setter Property="VerticalAlignment"
+                                        Value="Center" />
+                                <Setter Property="Margin"
+                                        Value="0,0,0,0" />
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>

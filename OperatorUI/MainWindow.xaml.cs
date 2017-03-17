@@ -58,33 +58,10 @@ namespace OperatorUI
             ++_viewModel.Counter;
         }
 
-        private void OnLog(string msg)
+        private void OnLog(string message)
         {
-            if (msg.StartsWith("TRACE", StringComparison.Ordinal))
-            {
-                _viewModel.AddLogOutput(new Trace(msg));
-            }
-            else if (msg.StartsWith("DEBUG", StringComparison.Ordinal))
-            {
-                _viewModel.AddLogOutput(new Debug(msg));
-            }
-            else if (msg.StartsWith("ERROR", StringComparison.Ordinal))
-            {
-                _viewModel.AddLogOutput(new Error(msg));
-            }
-            else if (msg.StartsWith("FATAL", StringComparison.Ordinal))
-            {
-                _viewModel.AddLogOutput(new Fatal(msg));
-            }
-            else if (msg.StartsWith("INFO", StringComparison.Ordinal))
-            {
-                _viewModel.AddLogOutput(new Info(msg));
-            }
-            else
-            {
-                return;
-            }
-
+            if(message.StartsWith("LOGMESSAGE", StringComparison.Ordinal))
+                _viewModel.AddLogOutput(new LogOutput(message));
         }
     }
 }

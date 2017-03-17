@@ -22,50 +22,45 @@ namespace Common
         public static async Task DebugEx(this Logger log, string funcName, string message, bool willBeLoggedToUi = true)
         {
             log.Debug("{0}|{1}", funcName, message);
-            //TODO: debug - loop
+
             if(!willBeLoggedToUi)
             {
                 return;
             }
-            var writeAsync = Connection?.WriteAsync($"DEBUG {funcName}|{message}", CancellationToken.None);
-            if (writeAsync != null)
-                await writeAsync;
+            await FormatMessageAndWriteASync("DEBUG", funcName, message);
 
         }
 
         public static async Task ErrorEx(this Logger log, string funcName, string message)
         {
             log.Error("{0}|{1}", funcName, message);
-            var writeAsync = Connection?.WriteAsync($"ERROR {funcName}|{message}", CancellationToken.None);
-            if (writeAsync != null)
-                await writeAsync;
+
+            await FormatMessageAndWriteASync("ERROR", funcName, message);
+
         }
 
         public static async Task FatalEx(this Logger log, string funcName, string message)
         {
             log.Fatal("{0}|{1}", funcName, message);
-            var writeAsync = Connection?.WriteAsync($"FATAL {funcName}|{message}", CancellationToken.None);
-            if (writeAsync != null)
-                await writeAsync;
+
+            await FormatMessageAndWriteASync("FATAL", funcName, message);
         }
         public static async Task InfoEx(this Logger log, string funcName, string message)
         {
-            try
-            {
-                log.Info("{0}|{1}", funcName, message);
-                var writeAsync = Connection?.WriteAsync($"INFO {funcName}|{message}", CancellationToken.None);
-                if (writeAsync != null)
-                    await writeAsync;
-            }
-            catch (Exception e)
-            {
-                log.Error(e, "asd");
-            }
+            log.Info("{0}|{1}", funcName, message);
+            
+            await FormatMessageAndWriteASync("INFO", funcName, message);
         }
 
-        private static async Task FormatMessageAndWriteASync(string level, string funcName, string message)
+        private static async Task FormatMessageAndWriteASync(string level, string functionName, string message)
         {
-            var writeAsync = Connection?.WriteAsync($"LOGMESSAGE;{level};{funcName};{message}", CancellationToken.None);
+            string separator = ";;";
+            var writeAsync = Connection?.WriteAsync("LOGMESSAGE" + 
+                separator + level + 
+                separator + functionName + 
+                separator + DateTime.Now.ToString() + 
+                separator + message, CancellationToken.None);
+
             if (writeAsync != null)
                 await writeAsync;
         }
