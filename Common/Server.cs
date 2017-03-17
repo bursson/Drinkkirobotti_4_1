@@ -213,7 +213,7 @@ namespace Common
             
             _tcpListener.Start();
 
-            Log.InfoEx(funcName, $"[{_logName}] Start listening to port {_port}");
+            await Log.InfoEx(funcName, $"[{_logName}] Start listening to port {_port}");
 
             // Register CancellationToken to call _tcpListener.Stop() on cancel.
             // AcceptTcpClientAsync() then throws SocketException and cancels properly.
@@ -242,7 +242,7 @@ namespace Common
                     _sendMessageFailedSignal = new SemaphoreSlim(0, 1);
                     _receiveMessageSignal = new SemaphoreSlim(0, 1);
 
-                    Log.InfoEx(funcName, $"[{_logName}] New connection received {_tcpClient.Client.RemoteEndPoint}");
+                    await Log.InfoEx(funcName, $"[{_logName}] New connection received {_tcpClient.Client.RemoteEndPoint}");
 
                     // Throw InvalidOperationException when disconnected and trying to get stream.
                     _tcpStream = _tcpClient.GetStream();

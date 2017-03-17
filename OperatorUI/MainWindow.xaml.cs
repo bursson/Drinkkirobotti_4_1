@@ -29,6 +29,7 @@ namespace OperatorUI
         {
             InitializeComponent();
             RobotServiceConnection.OnPong += OnPong;
+            RobotServiceConnection.OnInfo += OnInfo;
             var connTask = RobotServiceConnection.Run(_cts.Token);
 
             DataContext = _viewModel;
@@ -55,6 +56,11 @@ namespace OperatorUI
         private void OnPong()
         {
             ++_viewModel.Counter;
+        }
+
+        private void OnInfo(string msg)
+        {
+            _viewModel.WriteLine(new LogOutput(msg));
         }
     }
 }
