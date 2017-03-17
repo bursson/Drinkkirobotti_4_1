@@ -27,8 +27,8 @@ namespace OperatorUI
                 return;
             }
             LogLevel = messageBreakDown[1];
-            FunctionName = messageBreakDown[2];
-            DateTime = messageBreakDown[3];
+            FunctionName = "Calling function name: " + messageBreakDown[2] + "().\nSent: " + messageBreakDown[3] + ".\nReceived: " + DateTime.Now;
+            TimeSent = messageBreakDown[3];
             Message = messageBreakDown[4];
         }
 
@@ -36,10 +36,8 @@ namespace OperatorUI
 
         public string FunctionName { get; private set; }
 
-        public string DateTime { get; private set; }
+        public string TimeSent { get; private set; }
         
         public string Message { get; private set; }
-
-
     }
 }
