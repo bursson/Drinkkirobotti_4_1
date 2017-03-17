@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Common;
+using NLog;
 
 namespace ServiceLayer
 {
@@ -9,13 +10,18 @@ namespace ServiceLayer
     {
         private static readonly Server Connection = new Server(7676, "\r\n", true, nameof(OperatorConnection));
 
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+
         public static async Task Run(CancellationToken ct)
         {
+            NLogExtensions.Connection = Connection;
+
             var connTask = Connection.Run(ct);
 
             while (!ct.IsCancellationRequested)
             {
                 await Connection.GetConnectedAsync(ct);
+                await Log.InfoEx(nameof(Run), "Connected");
                 await HandleConnection(ct);
             }
             ct.ThrowIfCancellationRequested();
