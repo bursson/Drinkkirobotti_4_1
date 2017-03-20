@@ -87,11 +87,11 @@ namespace UnitTests
         public void TestOrder()
         {
             var justADrink = new Drink("some");
-            var justAOrder = new Order(OrderType.Drink, 1, justADrink);
+            var justAOrder = new Order(OrderType.Drink, 1, 1, justADrink);
             Assert.AreEqual(justAOrder.OrderId, 1, "OrderID");
             Assert.AreEqual(justAOrder.GetOrderType(), OrderType.Drink, "Ordertype");
             justADrink.AddPortion(new Portion(new Bottle("a"), 3));
-            justAOrder = new Order(OrderType.Drink, 2, justADrink);
+            justAOrder = new Order(OrderType.Drink, 2, 1, justADrink);
             Assert.AreEqual(justAOrder.GetRecipe(), justADrink, "Getrecipe");
 
             justADrink.AddPortion(new Portion(new Bottle("b"), 10));
@@ -151,8 +151,8 @@ namespace UnitTests
             Assert.AreEqual(_queue.Count, 1, "Queuecount2");
             Assert.IsTrue(_queue.Add(new Order(OrderType.Beer, 2), 88));
             Assert.AreEqual(_queue.Count, 2, "Queuecount3");
-            Assert.IsTrue(_queue.Add(new Order(OrderType.Drink, 3, new Drink("A")), 10));
-            Assert.IsTrue(_queue.Add(new Order(OrderType.Drink, 0, new Drink("B")), 10));
+            Assert.IsTrue(_queue.Add(new Order(OrderType.Drink, 3, 1, new Drink("A")), 10));
+            Assert.IsTrue(_queue.Add(new Order(OrderType.Drink, 0, 1, new Drink("B")), 10));
 
             Assert.AreEqual(_queue.Pop().GetOrderType(), OrderType.Beer, "Queue1" );
             Assert.AreEqual(_queue.Pop().GetRecipe().Name, "B", "Queue2");
