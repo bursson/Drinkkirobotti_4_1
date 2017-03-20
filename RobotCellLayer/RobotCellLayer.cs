@@ -27,6 +27,10 @@ namespace RobotCellLayer
                     return false;
                 }
                 return true;
+            }else if (portname == "SIM")
+            {
+                _robot = new DummyComm();
+                return true;
             }
             return false;
         }

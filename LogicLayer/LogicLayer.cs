@@ -72,8 +72,18 @@ namespace LogicLayer
             _drinks = args.Drinks;
             _sparkling = args.Sparkling;
 
-            // Initialize the robot, TODO: read port drom cfg and throw if false
-            _robot.AddRobot("ABB", "COM3");
+            // Initialize the robot, TODO: read port from cfg and throw if false
+            switch (args.Mode)
+            {
+                case RunMode.Production:
+                    _robot.AddRobot("ABB", "COM3");
+                    break;
+                case RunMode.Simulation:
+                    _robot.AddRobot("SIMULATION", "SIM");
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException($"RunMode argument \"{args.Mode}\" out of range");
+            }
             
             if (result)
             {
