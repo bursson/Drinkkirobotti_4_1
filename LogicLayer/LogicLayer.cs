@@ -23,10 +23,13 @@ namespace LogicLayer
         private OrderQueue _orderQueue;
         private Bottleshelf _currentShelf;
         private Bottleshelf _reservedShelf;
+        private Bottle _currentBottle;
 
         private bool _beer;
         private bool _drinks;
         private bool _sparkling;
+
+        private static int REMOVELIMIT = 10;
 
         /// <summary>
         /// Creates a new LogicLayer.
@@ -69,6 +72,9 @@ namespace LogicLayer
             _drinks = args.Drinks;
             _sparkling = args.Sparkling;
 
+            // Initialize the robot, TODO: read port drom cfg and throw if false
+            _robot.AddRobot("ABB", "COM3");
+            
             if (result)
             {
                 Log.InfoEx(fName, "Initialized LogicLayer successfully");
@@ -101,7 +107,8 @@ namespace LogicLayer
             var bottle = _currentShelf.Find(name);
             var location = _currentShelf.Find(bottle.BottleId);
             Log.InfoEx("GrabBottle", $"Grabbing bottle {bottle.Name} with ID: {bottle.BottleId} from location {location}");
-            // Run IComm task
+            await _robot.grabBottle(location);
+            _currentBottle = bottle;
         }
 
         private async Task GetNewBottle(Bottle bottle)
@@ -109,32 +116,61 @@ namespace LogicLayer
             if (_systemState != State.Idle) throw new StateViolationException();
             if (_currentShelf.AvailableSlots() < 1) 
             _systemState = State.GetNewBottle;
-            Log.InfoEx("GetNewBottle", $"Getting a new bottle {bottle.Name} with ID: {bottle.BottleId}");
-            // Run IComm task
             _currentShelf.AddBottle(bottle);
+            var location = _currentShelf.Find(bottle.BottleId);
+            Log.InfoEx("GetNewBottle", $"Getting a new bottle {bottle.Name} with ID: {bottle.BottleId} to location {location}");
+            await _robot.getNewBottle(location);
+            _systemState = State.Idle;
+
         }
 
-        private async Task returnBottle(Bottle bottle)
+        private async Task ReturnBottle(Bottle bottle)
         {
             if (_systemState != State.PourDrinks) throw new StateViolationException();
             var location = _currentShelf.Find(bottle.BottleId);
             _systemState = State.ReturnBottle;
             Log.InfoEx("returnBottle", $"Returning {bottle.Name} with ID: {bottle.BottleId} to location {location}");
-            // Run IComm task
+            await _robot.returnBottle(location);
             _systemState = State.Idle;
         }
 
-        private async Task removeBottle(Bottle bottle)
+        private async Task RemoveBottle(Bottle bottle)
         {
             if (_systemState == State.PourSparkling || _systemState == State.PourDrinks) throw new StateViolationException();
             _systemState = State.ReturnBottle;
             Log.InfoEx("removeBottle", $"Removing {bottle.Name} with ID: {bottle.BottleId}");
-            // Run IComm task
+            await _robot.removeBottle();
             if (bottle.Name != "Sparkling")
             {
                 _currentShelf.RemoveBottle(bottle);
             }
             _systemState = State.Idle;
+        }
+
+        private async Task PourBottle(Bottle bottle, int amount, int howMany)
+        {
+            if (_systemState != State.GrabBottle) throw new StateViolationException();
+            _systemState = State.PourDrinks;
+            // Log
+            await _robot.pourBottle(amount, howMany);
+        }
+
+        private async Task PourDrink(Drink drink, int howMany)
+        {
+            foreach (var portion in drink.Portions())
+            {
+                await GrabBottle(portion.Bottle.Name);
+                await PourBottle(_currentBottle, portion.Amount, howMany);
+                if (_currentBottle.Volume < REMOVELIMIT)
+                {
+                    await RemoveBottle(_currentBottle);
+                }
+                else
+                {
+                    await ReturnBottle(_currentBottle);
+                }
+                
+            }
         }
 
     }
