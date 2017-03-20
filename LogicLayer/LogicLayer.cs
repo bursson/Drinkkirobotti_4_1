@@ -24,6 +24,7 @@ namespace LogicLayer
         private Bottleshelf _currentShelf;
         private Bottleshelf _reservedShelf;
         private Bottle _currentBottle;
+        private Task _currentTask;
 
         private bool _beer;
         private bool _drinks;
@@ -102,6 +103,37 @@ namespace LogicLayer
         {
             // TODO: Implement logic loop here with tons of private functions.
             _systemState = State.Idle;
+            var currentTaskCt = new CancellationTokenSource();
+            while (!ct.IsCancellationRequested)
+            {
+                if (!_currentTask.IsCompleted)
+                {
+                    continue;
+                }
+                var nextActivity = _activityQueue.Pop();
+                currentTaskCt = new CancellationTokenSource();
+                switch (nextActivity.Type)
+                {
+                    case ActivityType.ProcessOrders:
+                        _currentTask = ProcessOrders(currentTaskCt.Token);
+                        _currentTask.Start();
+                        break;
+                    case ActivityType.Idle:
+                        await Task.Delay(500);
+                        break;
+                    case ActivityType.IdleDemo:
+                        await Task.Delay(500);
+                        break;
+                    case ActivityType.Macro:
+                        await Task.Delay(500);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+            currentTaskCt.Cancel();
+            await _currentTask;
+
         }
         public void Dispose()
         {
@@ -141,6 +173,7 @@ namespace LogicLayer
             _systemState = State.ReturnBottle;
             Log.InfoEx("returnBottle", $"Returning {bottle.Name} with ID: {bottle.BottleId} to location {location}");
             await _robot.returnBottle(location);
+            _currentBottle = null;
             _systemState = State.Idle;
         }
 
@@ -154,6 +187,7 @@ namespace LogicLayer
             {
                 _currentShelf.RemoveBottle(bottle);
             }
+            _currentBottle = null;
             _systemState = State.Idle;
         }
 
@@ -180,6 +214,27 @@ namespace LogicLayer
                     await ReturnBottle(_currentBottle);
                 }
                 
+            }
+        }
+
+        private async Task ProcessOrders(CancellationToken ct)
+        {
+            if (_orderQueue.Count < 1)
+            {
+                await Task.Delay(500, ct);
+            }
+            if (ct.IsCancellationRequested)
+            {
+                return;
+            }
+            while (_orderQueue.Count > 0)
+            {
+                var currentOrder = _orderQueue.Pop();
+                Log.InfoEx("ProcessOrders", $"Started processing order {currentOrder.OrderId}");
+                if (currentOrder.GetOrderType() == OrderType.Drink)
+                {
+                    await PourDrink(currentOrder.GetRecipe(), currentOrder._howMany);
+                }
             }
         }
 
