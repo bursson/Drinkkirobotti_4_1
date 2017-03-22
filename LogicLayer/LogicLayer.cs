@@ -20,8 +20,8 @@ namespace LogicLayer
         private readonly DA _da; // DataAccess.
 
         private ActivityQueue _activityQueue;
-        private OrderQueue _orderQueue;
-        private Bottleshelf _currentShelf;
+        public OrderQueue Queue { get; private set; }
+        public Bottleshelf CurrentShelf { get; private set; }
         private Bottleshelf _reservedShelf;
         private Bottle _currentBottle;
         private Task _currentTask;
@@ -50,7 +50,7 @@ namespace LogicLayer
 
         public async Task<bool> Initialize(StartArguments args, CancellationToken ct)
         {
-            bool result = Convert.ToBoolean(new Random(Convert.ToInt32(DateTime.Now.Second))); // lul.
+            bool result = true;
             string errorMsg = string.Empty;
             const string fName = nameof(Initialize);
             _systemState = State.Initialize;
@@ -62,16 +62,18 @@ namespace LogicLayer
             _activityQueue = args.IdleActivity != null ? new ActivityQueue(args.IdleActivity) : new ActivityQueue(new Activity(ActivityType.Idle));
 
             // Load bottleshelf backup if provided, otherwise presume it's empty
-            _currentShelf = args.BackupShelf != null
+            CurrentShelf = args.BackupShelf != null
                 ? (_reservedShelf = args.BackupShelf)
                 : (_reservedShelf = new Bottleshelf());
 
-            _orderQueue = new OrderQueue();
+            Queue = args.BacckupQueue ?? new OrderQueue();
 
             // What services are available
             _beer = args.Beer;
             _drinks = args.Drinks;
             _sparkling = args.Sparkling;
+
+            _currentTask = Task.Delay(1);
 
             // Initialize the robot, TODO: read port from cfg and throw if false
             switch (args.Mode)
@@ -116,7 +118,6 @@ namespace LogicLayer
                 {
                     case ActivityType.ProcessOrders:
                         _currentTask = ProcessOrders(currentTaskCt.Token);
-                        _currentTask.Start();
                         break;
                     case ActivityType.Idle:
                         await Task.Delay(500);
@@ -133,7 +134,6 @@ namespace LogicLayer
             }
             currentTaskCt.Cancel();
             await _currentTask;
-
         }
         public void Dispose()
         {
@@ -146,8 +146,8 @@ namespace LogicLayer
         {
             if (_systemState != State.Idle) throw new StateViolationException();
             _systemState = State.GrabBottle;
-            var bottle = _currentShelf.Find(name);
-            var location = _currentShelf.Find(bottle.BottleId);
+            var bottle = CurrentShelf.Find(name);
+            var location = CurrentShelf.Find(bottle.BottleId);
             Log.InfoEx("GrabBottle", $"Grabbing bottle {bottle.Name} with ID: {bottle.BottleId} from location {location}");
             await _robot.grabBottle(location);
             _currentBottle = bottle;
@@ -156,10 +156,10 @@ namespace LogicLayer
         private async Task GetNewBottle(Bottle bottle)
         {
             if (_systemState != State.Idle) throw new StateViolationException();
-            if (_currentShelf.AvailableSlots() < 1) 
+            if (CurrentShelf.AvailableSlots() < 1) 
             _systemState = State.GetNewBottle;
-            _currentShelf.AddBottle(bottle);
-            var location = _currentShelf.Find(bottle.BottleId);
+            CurrentShelf.AddBottle(bottle);
+            var location = CurrentShelf.Find(bottle.BottleId);
             Log.InfoEx("GetNewBottle", $"Getting a new bottle {bottle.Name} with ID: {bottle.BottleId} to location {location}");
             await _robot.getNewBottle(location);
             _systemState = State.Idle;
@@ -169,7 +169,7 @@ namespace LogicLayer
         private async Task ReturnBottle(Bottle bottle)
         {
             if (_systemState != State.PourDrinks) throw new StateViolationException();
-            var location = _currentShelf.Find(bottle.BottleId);
+            var location = CurrentShelf.Find(bottle.BottleId);
             _systemState = State.ReturnBottle;
             Log.InfoEx("returnBottle", $"Returning {bottle.Name} with ID: {bottle.BottleId} to location {location}");
             await _robot.returnBottle(location);
@@ -185,7 +185,7 @@ namespace LogicLayer
             await _robot.removeBottle();
             if (bottle.Name != "Sparkling")
             {
-                _currentShelf.RemoveBottle(bottle);
+                CurrentShelf.RemoveBottle(bottle);
             }
             _currentBottle = null;
             _systemState = State.Idle;
@@ -196,7 +196,8 @@ namespace LogicLayer
             if (_systemState != State.GrabBottle) throw new StateViolationException();
             _systemState = State.PourDrinks;
             // Log
-            await _robot.pourBottle(amount, howMany);
+            await _robot.pourBottle(amount / bottle.PourSpeed, howMany);
+            bottle.Volume -= amount * howMany;
         }
 
         private async Task PourDrink(Drink drink, int howMany)
@@ -219,17 +220,18 @@ namespace LogicLayer
 
         private async Task ProcessOrders(CancellationToken ct)
         {
-            if (_orderQueue.Count < 1)
+            if (Queue.Count < 1)
             {
+                return;
                 await Task.Delay(500, ct);
             }
             if (ct.IsCancellationRequested)
             {
                 return;
             }
-            while (_orderQueue.Count > 0)
+            while (Queue.Count > 0)
             {
-                var currentOrder = _orderQueue.Pop();
+                var currentOrder = Queue.Pop();
                 Log.InfoEx("ProcessOrders", $"Started processing order {currentOrder.OrderId}");
                 if (currentOrder.GetOrderType() == OrderType.Drink)
                 {
@@ -243,12 +245,13 @@ namespace LogicLayer
     public class StartArguments
     {
         // TODO: Write required starting arguments here.
-        public RunMode Mode { get; private set; }
-        public bool Beer { get; private set; }
-        public bool Drinks { get; private set; }
-        public bool Sparkling { get; private set; }
-        public Bottleshelf BackupShelf { get; private set; }
-        public Activity IdleActivity { get; private set; }
+        public RunMode Mode { get;  set; }
+        public bool Beer { get; set; }
+        public bool Drinks { get; set; }
+        public bool Sparkling { get; set; }
+        public Bottleshelf BackupShelf { get; set; }
+        public Activity IdleActivity { get; set; }
+        public OrderQueue BacckupQueue { get; set; }
     }
 
 

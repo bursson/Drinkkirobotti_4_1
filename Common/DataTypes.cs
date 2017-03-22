@@ -153,8 +153,9 @@ namespace Common
         /// </summary>
         /// <param name="orderType">Type of the order</param>
         /// <param name="id">Unique id for the order</param>
+        /// <param name="howMany"></param>
         /// <param name="drink">If the order is a drink, pass it here</param>
-        public Order(OrderType orderType, int id, int howMany = 1, Drink drink = null)
+        public Order(OrderType orderType, int id, int howMany, Drink drink = null)
         {
             _orderType = orderType;
             OrderId = id;

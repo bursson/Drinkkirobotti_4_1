@@ -7,6 +7,7 @@ using Common;
 using LogicLayer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RobotService;
+using LogicTest;
 
 
 namespace UnitTests
@@ -147,9 +148,9 @@ namespace UnitTests
         public void Orderqueue()
         {
             Assert.AreEqual(_queue.Count, 0, "Queuecount1");
-            Assert.IsTrue(_queue.Add(new Order(OrderType.Sparkling, 1), 10));
+            Assert.IsTrue(_queue.Add(new Order(OrderType.Sparkling, 1, 1), 10));
             Assert.AreEqual(_queue.Count, 1, "Queuecount2");
-            Assert.IsTrue(_queue.Add(new Order(OrderType.Beer, 2), 88));
+            Assert.IsTrue(_queue.Add(new Order(OrderType.Beer, 2, 1), 88));
             Assert.AreEqual(_queue.Count, 2, "Queuecount3");
             Assert.IsTrue(_queue.Add(new Order(OrderType.Drink, 3, 1, new Drink("A")), 10));
             Assert.IsTrue(_queue.Add(new Order(OrderType.Drink, 0, 1, new Drink("B")), 10));
@@ -160,7 +161,7 @@ namespace UnitTests
             Assert.AreEqual(_queue.Pop().GetRecipe().Name, "A", "Queue4");
             for (int i = 0; i < 20; i++)
             {
-                Assert.IsTrue(_queue.Add(new Order(OrderType.Sparkling, i), 10));
+                Assert.IsTrue(_queue.Add(new Order(OrderType.Sparkling, i, 1), 10));
             }
             for (int i = 0; i < 20; i++)
             {
@@ -170,7 +171,7 @@ namespace UnitTests
 
             try
             {
-                _queue.Add(new Order(OrderType.Beer, 2), -1);
+                _queue.Add(new Order(OrderType.Beer, 2, 1), -1);
                 Assert.Fail("Expected a ArgumentOutOfRangeException");
             }
             catch (ArgumentOutOfRangeException e)
