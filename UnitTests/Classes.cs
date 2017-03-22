@@ -73,13 +73,10 @@ namespace UnitTests
         public void TestPortion()
         {
             Bottle justABottle = new Bottle("something");
-            Portion invalidPortion = new Portion(justABottle, 0);
+            Portion invalidPortion = new Portion("something", 0);
             Assert.IsFalse(invalidPortion.IsValid(), "Invalid portion 1");
-            invalidPortion.Bottle.Name = "";
-            invalidPortion.Amount = 2;
-            Assert.IsFalse(invalidPortion.IsValid(), "Invalid portion 2");
             justABottle.Name = "something";
-            Portion validPortion = new Portion(justABottle, 2);
+            Portion validPortion = new Portion("something", 2);
             Assert.IsTrue(validPortion.IsValid(), "Valid portion 1");
 
 
@@ -91,11 +88,11 @@ namespace UnitTests
             var justAOrder = new Order(OrderType.Drink, 1, 1, justADrink);
             Assert.AreEqual(justAOrder.OrderId, 1, "OrderID");
             Assert.AreEqual(justAOrder.GetOrderType(), OrderType.Drink, "Ordertype");
-            justADrink.AddPortion(new Portion(new Bottle("a"), 3));
+            justADrink.AddPortion(new Portion("a", 3));
             justAOrder = new Order(OrderType.Drink, 2, 1, justADrink);
             Assert.AreEqual(justAOrder.GetRecipe(), justADrink, "Getrecipe");
 
-            justADrink.AddPortion(new Portion(new Bottle("b"), 10));
+            justADrink.AddPortion(new Portion("b", 10));
             Assert.IsFalse(justADrink.RemovePortion("c"));
             Assert.AreEqual(justADrink.Portions().Count, 2);
             Assert.IsTrue(justADrink.RemovePortion("b"));
@@ -119,11 +116,11 @@ namespace UnitTests
                     if (index < 3)
                     {
                         Bottle t = _bottleshelf[index];
-                        _drinkdb[i].AddPortion(t, i);
+                        _drinkdb[i].AddPortion(t.Name, i);
                     }
                     else
                     {
-                        Portion newPortion = new Portion(_bottleshelf[index], i);
+                        Portion newPortion = new Portion(_bottleshelf[index].Name, i);
                         _drinkdb[i].AddPortion(newPortion);
                     }
 
@@ -135,7 +132,7 @@ namespace UnitTests
                 Assert.AreEqual(_drinkdb[i].Name, "Testdrink" + i, $"Drinkname {_drinkdb[i].Name}");
                 for (int j = 0; j < _bottleshelf.Count; j++)
                 {
-                    Assert.AreEqual(_drinkdb[i].Portions()[j].Bottle, _bottleshelf[j], $"Bottlename {_bottleshelf[j].Name}");
+                    Assert.AreEqual(_drinkdb[i].Portions()[j].Name, _bottleshelf[j].Name, $"Bottlename {_bottleshelf[j].Name}");
                     Assert.AreEqual(_drinkdb[i].Portions()[j].Amount, i, $"BottleAmount {_bottleshelf[j].Name}");
                 }
 

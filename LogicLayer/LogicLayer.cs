@@ -30,7 +30,7 @@ namespace LogicLayer
         private bool _drinks;
         private bool _sparkling;
 
-        private static int REMOVELIMIT = 10;
+        private static int REMOVELIMIT = 15;
 
         /// <summary>
         /// Creates a new LogicLayer.
@@ -179,7 +179,7 @@ namespace LogicLayer
 
         private async Task RemoveBottle(Bottle bottle)
         {
-            if (_systemState == State.PourSparkling || _systemState == State.PourDrinks) throw new StateViolationException();
+            if (!(_systemState == State.PourSparkling || _systemState == State.PourDrinks)) throw new StateViolationException();
             _systemState = State.ReturnBottle;
             Log.InfoEx("removeBottle", $"Removing {bottle.Name} with ID: {bottle.BottleId}");
             await _robot.removeBottle();
@@ -204,7 +204,7 @@ namespace LogicLayer
         {
             foreach (var portion in drink.Portions())
             {
-                await GrabBottle(portion.Bottle.Name);
+                await GrabBottle(portion.Name);
                 await PourBottle(_currentBottle, portion.Amount, howMany);
                 if (_currentBottle.Volume < REMOVELIMIT)
                 {

@@ -61,13 +61,13 @@ namespace Common
 
     public class Portion
     {
-        public Bottle Bottle;
+        public string Name;
         public int Amount;
 
-        public Portion(Bottle bottle, int amount)
+        public Portion(string name, int amount)
         {
-            if (bottle == null) throw new ArgumentNullException(nameof(bottle));
-            this.Bottle = bottle;
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            this.Name = name;
             this.Amount = amount;
         }
         
@@ -77,7 +77,7 @@ namespace Common
         /// <returns>True if the bottle has a name and amount is over zero</returns>
         public bool IsValid()
         {
-            return  Bottle.Name.Length > 0 && Amount > 0;
+            return  Name.Length > 0 && Amount > 0;
         }
     }
     public class Drink
@@ -103,7 +103,7 @@ namespace Common
             if (portion == null) throw new ArgumentNullException(nameof(portion));
             for (var i = 0; i < _portions.Count; ++i)
             {
-                if (_portions[i].Bottle.Name != portion.Bottle.Name) continue;
+                if (_portions[i].Name != portion.Name) continue;
                 if (_portions[i].Amount == portion.Amount)
                 {
                     return false;
@@ -120,7 +120,7 @@ namespace Common
         {
             for (int i = 0; i < _portions.Count; i++)
             {
-                if (_portions[i].Bottle.Name == bottlename)
+                if (_portions[i].Name == bottlename)
                 {
                     _portions.Remove(_portions[i]);
                     return true;
@@ -135,9 +135,9 @@ namespace Common
         /// <param name="bottle">The bottle</param>
         /// <param name="amount">The amoount in cl</param>
         /// <returns>Returns true if a new portion was added or edited</returns>
-        public bool AddPortion(Bottle bottle, int amount)
+        public bool AddPortion(string name, int amount)
         {
-            return AddPortion(new Portion(bottle, amount));
+            return AddPortion(new Portion(name, amount));
         }
 
         public List<Portion> Portions() { return _portions;}

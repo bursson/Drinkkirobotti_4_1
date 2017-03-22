@@ -40,14 +40,14 @@ namespace LogicTest
             var queue = new OrderQueue();
 
             var kv = new Drink("Kossuvissy");
-            Assert.IsTrue(kv.AddPortion(shelf.Find("Vodka"), 4));
-            Assert.IsTrue(kv.AddPortion(shelf.Find("Vesi"), 10));
+            Assert.IsTrue(kv.AddPortion("Vodka", 4));
+            Assert.IsTrue(kv.AddPortion("Vesi", 10));
 
             var mehu = new Drink("Mehu");
-            Assert.IsTrue(mehu.AddPortion(shelf.Find("Mehu"), 10));
+            Assert.IsTrue(mehu.AddPortion("Mehu", 10));
 
             queue.Add(new Tuple<Order, int>(new Order(OrderType.Drink, 1, 1, kv), 10));
-            queue.Add(new Tuple<Order, int>(new Order(OrderType.Drink, 2, 2, mehu), 10));
+            queue.Add(new Tuple<Order, int>(new Order(OrderType.Drink, 2, 9, mehu), 10));
             queue.Add(new Tuple<Order, int>(new Order(OrderType.Drink, 3, 3, kv), 10));
 
             var startarg = new StartArguments();
@@ -76,8 +76,9 @@ namespace LogicTest
             ct.Cancel();
             
             Assert.AreEqual(0, logic.Queue.Count);
-            Assert.AreEqual(80, logic.CurrentShelf.Find("Mehu").Volume);
+            //Assert.AreEqual(80, logic.CurrentShelf.Find("Mehu").Volume);
             Assert.AreEqual(84, logic.CurrentShelf.Find("Vodka").Volume);
+            Assert.IsNull(logic.CurrentShelf.Find("Mehu"));
             Assert.AreEqual(60, logic.CurrentShelf.Find("Vesi").Volume);
             logic.Dispose();
         }
