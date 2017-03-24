@@ -11,7 +11,13 @@ namespace ServiceLayer
     {
         public async Task<MessageData> ReadDataAsync(CancellationToken ct)
         {
-            throw new NotImplementedException();
+            // TODO ACtual implementation, await data messages and return them:
+            await Task.Delay(10000, ct);
+            return new MessageData
+            {
+                DummyDataElement = "DummyDataMessage"
+            }; 
+
         }
 
         public async Task<MessageConfig> ReadConfigAsync(CancellationToken ct)

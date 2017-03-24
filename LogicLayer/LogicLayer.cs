@@ -19,6 +19,8 @@ namespace LogicLayer
         private readonly RobotCell _robot; // RobotCellLayer
         private readonly DA _da; // DataAccess.
 
+        private Task _readDataMsgLoop; // Task for read data messages, should be canceled once disposed.
+
         private ActivityQueue _activityQueue;
         public OrderQueue Queue { get; private set; }
         public Bottleshelf CurrentShelf { get; private set; }
@@ -104,6 +106,7 @@ namespace LogicLayer
         public async Task Run(CancellationToken ct)
         {
             // TODO: Implement logic loop here with tons of private functions.
+            _readDataMsgLoop = ReadFrontEndMessageLoop(ct); // Start to listen for data messages.
             _systemState = State.Idle;
             var currentTaskCt = new CancellationTokenSource();
             while (!ct.IsCancellationRequested)
@@ -120,13 +123,13 @@ namespace LogicLayer
                         _currentTask = ProcessOrders(currentTaskCt.Token);
                         break;
                     case ActivityType.Idle:
-                        await Task.Delay(500);
+                        await Task.Delay(500,ct);
                         break;
                     case ActivityType.IdleDemo:
-                        await Task.Delay(500);
+                        await Task.Delay(500,ct);
                         break;
                     case ActivityType.Macro:
-                        await Task.Delay(500);
+                        await Task.Delay(500,ct);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -138,8 +141,9 @@ namespace LogicLayer
         public void Dispose()
         {
             const string fName = nameof(Dispose);
-            Log.InfoEx(fName, "Disposing LogicLayer");
+            Log.InfoEx(fName, "Disposing LogicLayer");            
             // TODO Dispose stuff here if needed, serialConnections etc.
+            // TODO: End read message loop.
         }
 
         private async Task GrabBottle(string name)
@@ -240,6 +244,29 @@ namespace LogicLayer
             }
         }
 
+        /// <summary>
+        /// Handles reading Data-message reading loop. 
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        private async Task ReadFrontEndMessageLoop(CancellationToken ct)
+        {
+            const string funcName = nameof(ReadFrontEndMessageLoop);
+            while (!ct.IsCancellationRequested)
+            {
+                Log.InfoEx(funcName, "Waiting for front-end data messages..");
+                var data = await _service.ReadDataAsync(ct);
+                Log.InfoEx(funcName, "Received data from front-end.");
+                HandleDataMessage(data);
+            }
+        }
+
+        private void HandleDataMessage(MessageData data)
+        {
+            const string funcName = nameof(HandleDataMessage);
+            // TODO: Handle MessageData object, add to queue etc.
+            Log.DebugEx(funcName, $"Retrieved data object: {data}");
+        }
     }
 
     public class StartArguments
