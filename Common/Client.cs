@@ -118,8 +118,9 @@ namespace Common
         /// </summary>
         /// <param name="msg"></param>
         /// <param name="ct"></param>
+        /// <param name="log"></param>
         /// <returns>True if message sent. False if connection lost.</returns>
-        public async Task<bool> WriteAsync(string msg, CancellationToken ct)
+        public async Task<bool> WriteAsync(string msg, CancellationToken ct, bool log = false)
         {
             const string funcName = nameof(WriteAsync);
 
@@ -128,7 +129,7 @@ namespace Common
                 return false;
             }
 
-            Log.DebugEx(funcName, $"[{_logName}] Sending message {msg}", false);
+            if(log) await Log.DebugEx(funcName, $"[{_logName}] Sending message {msg}", false);
 
             // Add end chars here
             var msgBytes = Encoding.UTF8.GetBytes(msg + (_implicitEndOfMessageString ? _endOfMessageString : string.Empty));

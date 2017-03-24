@@ -9,7 +9,7 @@ namespace Common
 {
     public interface IConnection
     {
-        Task<bool> WriteAsync(string msg, CancellationToken ct);
+        Task<bool> WriteAsync(string msg, CancellationToken ct, bool log = false);
         Task<string> ReadAsync(CancellationToken ct);
     }
 }

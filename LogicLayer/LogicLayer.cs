@@ -20,6 +20,8 @@ namespace LogicLayer
         private readonly DA _da; // DataAccess.
 
         private Task _readDataMsgLoop; // Task for read data messages, should be canceled once disposed.
+        private CancellationTokenSource _readLoopCts;
+        private CancellationTokenSource _linkedCts;
 
         private ActivityQueue _activityQueue;
         public OrderQueue Queue { get; private set; }
@@ -47,7 +49,6 @@ namespace LogicLayer
             _service = sl;
             _robot = r;
             _da = da;
-          
         }
 
         public async Task<bool> Initialize(StartArguments args, CancellationToken ct)
@@ -106,7 +107,9 @@ namespace LogicLayer
         public async Task Run(CancellationToken ct)
         {
             // TODO: Implement logic loop here with tons of private functions.
-            _readDataMsgLoop = ReadFrontEndMessageLoop(ct); // Start to listen for data messages.
+            _readLoopCts = new CancellationTokenSource();
+            _linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct,_readLoopCts.Token);
+            _readDataMsgLoop = ReadFrontEndMessageLoop(_linkedCts.Token); // Start to listen for data messages.
             _systemState = State.Idle;
             var currentTaskCt = new CancellationTokenSource();
             while (!ct.IsCancellationRequested)
@@ -138,12 +141,28 @@ namespace LogicLayer
             currentTaskCt.Cancel();
             await _currentTask;
         }
+        /// <summary>
+        /// Stops the LogicLayer.
+        /// </summary>
+        /// <returns></returns>
+        public async Task Stop()
+        {
+            const string funcName = nameof(Stop);
+            Log.InfoEx(funcName, "Stopping LogicLayer.");
+            
+            _readLoopCts.Cancel(); // Stop read data loop.
+            await _readDataMsgLoop; // wait until loop has ended.
+
+        }
         public void Dispose()
         {
             const string fName = nameof(Dispose);
             Log.InfoEx(fName, "Disposing LogicLayer");            
             // TODO Dispose stuff here if needed, serialConnections etc.
-            // TODO: End read message loop.
+            // End message read loop if not ended already.
+            if(!_readLoopCts.IsCancellationRequested) _readLoopCts.Cancel();
+            _readLoopCts.Dispose();
+            _linkedCts.Dispose();
         }
 
         private async Task GrabBottle(string name)
@@ -245,27 +264,37 @@ namespace LogicLayer
         }
 
         /// <summary>
-        /// Handles reading Data-message reading loop. 
+        /// Loop for reading all data messages from serviceLayer. 
         /// </summary>
         /// <param name="ct"></param>
         /// <returns></returns>
         private async Task ReadFrontEndMessageLoop(CancellationToken ct)
         {
             const string funcName = nameof(ReadFrontEndMessageLoop);
-            while (!ct.IsCancellationRequested)
+            try
             {
-                Log.InfoEx(funcName, "Waiting for front-end data messages..");
-                var data = await _service.ReadDataAsync(ct);
-                Log.InfoEx(funcName, "Received data from front-end.");
-                HandleDataMessage(data);
+                while (!ct.IsCancellationRequested)
+                {
+                    Log.InfoEx(funcName, "Waiting for front-end data messages..");
+                    var data = await _service.ReadDataAsync(ct);
+                    Log.InfoEx(funcName, "Received data from front-end.");
+                    HandleDataMessage(data);
+                }
             }
+            catch (OperationCanceledException)
+            {
+                Log.InfoEx(funcName, "Read message loop was canceled.");
+            }
+            
         }
-
+        /// <summary>
+        /// Handles the read messages from ServiceLayer
+        /// </summary>
+        /// <param name="data"></param>
         private void HandleDataMessage(MessageData data)
         {
             const string funcName = nameof(HandleDataMessage);
             // TODO: Handle MessageData object, add to queue etc.
-            Log.DebugEx(funcName, $"Retrieved data object: {data}");
         }
     }
 
