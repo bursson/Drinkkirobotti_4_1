@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,6 +45,7 @@ namespace RobotService
             // Main logic here
             await DA.InitializeDB();
             await DA.AddAnotherJalluToDBTest();
+            NLogExtensions.InitializeLogConnection(ct, IPAddress.Parse("127.0.0.1"), 9999);
 
             var operatorTask = OperatorConnection.Run(ct);
             var delayTask = Task.Delay(-1, ct);

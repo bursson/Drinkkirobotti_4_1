@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using NLog;
@@ -11,7 +12,13 @@ namespace Common
     /// </summary>
     public static class NLogExtensions
     {
-        public static IConnection Connection { private get; set; }
+        public static void InitializeLogConnection(CancellationToken ct, IPAddress host, int port)
+        {
+            Connection = new Client(host, port, "\r\n", true, "Logger");
+            Connection.Run(ct);
+        }
+
+        private static IConnection Connection { get; set; }
 
         public static async Task TraceEx(this Logger log, string funcName, string message, bool willBeLoggedToUi = true)
         {

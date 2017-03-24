@@ -55,6 +55,7 @@ namespace OperatorUI
             string msg;
             while (!ct.IsCancellationRequested && (msg = await LogServer.ReadAsync(ct)) != null)
             {
+                Console.WriteLine($"{nameof(HandleLogConnection)} Got: {msg}");
                 OnLog?.Invoke(msg);
             }
         }
