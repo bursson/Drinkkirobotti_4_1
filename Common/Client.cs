@@ -29,7 +29,7 @@ namespace Common
         }
     }
     
-    public class Client
+    public class Client : IConnection
     {
         private enum ConnectionStatusEnum
         {
@@ -128,7 +128,7 @@ namespace Common
                 return false;
             }
 
-            Log.DebugEx(funcName, $"[{_logName}] Sending message {msg}");
+            Log.DebugEx(funcName, $"[{_logName}] Sending message {msg}", false);
 
             // Add end chars here
             var msgBytes = Encoding.UTF8.GetBytes(msg + (_implicitEndOfMessageString ? _endOfMessageString : string.Empty));
@@ -233,7 +233,7 @@ namespace Common
         {
             const string funcName = nameof(Run);
             
-            Log.InfoEx(funcName, $"[{_logName}] Start client connection to host {_hostIp}:{_hostPort}");
+            Log.InfoEx(funcName, $"[{_logName}] Start client connection to host {_hostIp}:{_hostPort}", false);
 
             // Register CancellationToken to call _tcpClient.Close() on cancel.
             // ConnectAsync() then throws ObjectDisposedException and cancels properly.
@@ -263,7 +263,7 @@ namespace Common
                     _sendMessageFailedSignal = new SemaphoreSlim(0, 1);
                     _receiveMessageSignal = new SemaphoreSlim(0, 1);
 
-                    Log.InfoEx(funcName, $"[{_logName}] Connected to {_tcpClient.Client.RemoteEndPoint}");
+                    Log.InfoEx(funcName, $"[{_logName}] Connected to {_tcpClient.Client.RemoteEndPoint}", false);
 
                     // Throw InvalidOperationException when disconnected and trying to get stream.
                     _tcpStream = _tcpClient.GetStream();
@@ -279,7 +279,7 @@ namespace Common
                     // Check CancellationToken.
                     ct.ThrowIfCancellationRequested();
 
-                    Log.DebugEx(funcName, e.ToString());
+                    Log.DebugEx(funcName, e.ToString(), false);
                     await Task.Delay(10000, ct);
 
                     continue;
@@ -304,7 +304,7 @@ namespace Common
                     ConnectionStatus = ConnectionStatusEnum.Disconnected;
                     _tcpStream.Dispose();
                     _tcpClient.Close();
-                    Log.DebugEx(funcName, $"[{_logName}] Connection lost");
+                    Log.DebugEx(funcName, $"[{_logName}] Connection lost", false);
 
                     if (!_messageQueue.IsEmpty || _messageInQueue.CurrentCount > 0)
                     {
@@ -376,7 +376,7 @@ namespace Common
                     var msg = result.Substring(0, _implicitEndOfMessageString ? msgEndIndex : msgEndIndex + _endOfMessageString.Length);
                     result = result.Substring(msgEndIndex + _endOfMessageString.Length);
 
-                    Log.DebugEx(funcName, $"[{_logName}] Received message {msg}");
+                    Log.DebugEx(funcName, $"[{_logName}] Received message {msg}", false);
 
                     // Check token before adding message.
                     ct.ThrowIfCancellationRequested();

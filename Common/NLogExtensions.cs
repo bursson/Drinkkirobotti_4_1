@@ -11,58 +11,60 @@ namespace Common
     /// </summary>
     public static class NLogExtensions
     {
-        public static Server Connection { private get; set; }
+        public static IConnection Connection { private get; set; }
 
-        public static async Task TraceEx(this Logger log, string funcName, string message)
+        public static async Task TraceEx(this Logger log, string funcName, string message, bool willBeLoggedToUi = true)
         {
             log.Trace("{0}|{1}",funcName,message);
-            await FormatMessageAndWriteASync("TRACE", funcName, message);
+            await FormatMessageAndWriteASync("TRACE", funcName, message, willBeLoggedToUi);
         }
 
         public static async Task DebugEx(this Logger log, string funcName, string message, bool willBeLoggedToUi = true)
         {
             log.Debug("{0}|{1}", funcName, message);
 
-            if(!willBeLoggedToUi)
-            {
-                return;
-            }
-            await FormatMessageAndWriteASync("DEBUG", funcName, message);
+            await FormatMessageAndWriteASync("DEBUG", funcName, message, willBeLoggedToUi);
 
         }
 
-        public static async Task ErrorEx(this Logger log, string funcName, string message)
+        public static async Task ErrorEx(this Logger log, string funcName, string message, bool willBeLoggedToUi = true)
         {
             log.Error("{0}|{1}", funcName, message);
 
-            await FormatMessageAndWriteASync("ERROR", funcName, message);
+            await FormatMessageAndWriteASync("ERROR", funcName, message, willBeLoggedToUi);
 
         }
 
-        public static async Task FatalEx(this Logger log, string funcName, string message)
+        public static async Task FatalEx(this Logger log, string funcName, string message, bool willBeLoggedToUi = true)
         {
             log.Fatal("{0}|{1}", funcName, message);
 
-            await FormatMessageAndWriteASync("FATAL", funcName, message);
+            await FormatMessageAndWriteASync("FATAL", funcName, message, willBeLoggedToUi);
         }
-        public static async Task InfoEx(this Logger log, string funcName, string message)
+        public static async Task InfoEx(this Logger log, string funcName, string message, bool willBeLoggedToUi = true)
         {
             log.Info("{0}|{1}", funcName, message);
             
-            await FormatMessageAndWriteASync("INFO", funcName, message);
+            await FormatMessageAndWriteASync("INFO", funcName, message, willBeLoggedToUi);
         }
 
-        private static async Task FormatMessageAndWriteASync(string level, string functionName, string message)
+        private static async Task FormatMessageAndWriteASync(string level, string functionName, string message, bool willBeLoggedToUi)
         {
-            string separator = ";;";
-            var writeAsync = Connection?.WriteAsync("LOGMESSAGE" + 
-                separator + level + 
-                separator + functionName + 
-                separator + DateTime.Now.ToString() + 
-                separator + message, CancellationToken.None);
+            const string separator = ";;";
+            
+            if (!willBeLoggedToUi)
+            {
+                return;
+            }
 
-            if (writeAsync != null)
-                await writeAsync;
+            if (Connection != null)
+            {
+                await Connection.WriteAsync("LOGMESSAGE" +
+                separator + level +
+                separator + functionName +
+                separator + DateTime.Now +
+                separator + message, CancellationToken.None);
+            }
         }
     }
 }
