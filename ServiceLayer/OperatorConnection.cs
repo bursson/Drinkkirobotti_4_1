@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Common;
@@ -8,20 +9,22 @@ namespace ServiceLayer
 {
     public static class OperatorConnection
     {
-        private static readonly Server Connection = new Server(7676, "\r\n", true, nameof(OperatorConnection));
+        private static readonly Server ServerConnection = new Server(7676, "\r\n", true, nameof(OperatorConnection));
+        private static readonly Client LogClient = new Client(IPAddress.Parse("127.0.0.1"), 9999, "\r\n", true, nameof(OperatorConnection));
 
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         public static async Task Run(CancellationToken ct)
         {
-            NLogExtensions.Connection = Connection;
+            NLogExtensions.Connection = LogClient;
 
-            var connTask = Connection.Run(ct);
+            var connTask = ServerConnection.Run(ct);
+            var clientTask = LogClient.Run(ct);
 
             while (!ct.IsCancellationRequested)
             {
-                await Connection.GetConnectedAsync(ct);
-                await Log.InfoEx(nameof(Run), "Connected");
+                await Task.WhenAll(ServerConnection.GetConnectedAsync(ct), LogClient.GetConnectedAsync(ct));
+                Log.InfoEx(nameof(Run), "Connected");
                 await HandleConnection(ct);
             }
             ct.ThrowIfCancellationRequested();
@@ -30,7 +33,7 @@ namespace ServiceLayer
         private static async Task HandleConnection(CancellationToken ct)
         {
             string msg;
-            while (!ct.IsCancellationRequested && (msg = await Connection.ReadAsync(ct)) != null)
+            while (!ct.IsCancellationRequested && (msg = await ServerConnection.ReadAsync(ct)) != null)
             {
                 await HandleMessage(msg, ct);
             }
@@ -40,7 +43,7 @@ namespace ServiceLayer
         {
             if (msg.Equals("PING", StringComparison.Ordinal))
             {
-                await Connection.WriteAsync("PONG", ct);
+                await ServerConnection.WriteAsync("PONG", ct);
             }
         }
     }

@@ -14,29 +14,55 @@ namespace OperatorUI
         public static event Action OnPong;
         public static event Action<string> OnLog;
 
-        private static readonly Client Connection = new Client(IPAddress.Parse("127.0.0.1"), 7676, "\r\n", true, nameof(RobotServiceConnection));
+        private static readonly Server LogServer = new Server(9999, "\r\n", true, nameof(RobotServiceConnection));
+        private static readonly Client ClientConnection = new Client(IPAddress.Parse("127.0.0.1"), 7676, "\r\n", true, nameof(RobotServiceConnection));
 
         public static async Task Run(CancellationToken ct)
         {
-            var connTask = Connection.Run(ct);
+            var connTask = ClientConnection.Run(ct);
+            var serverTask = LogServer.Run(ct);
 
-            while (!ct.IsCancellationRequested)
+            var handleClient = Task.Run(async () =>
             {
-                await Connection.GetConnectedAsync(ct);
-                await HandleConnection(ct);
-            }
+                while (!ct.IsCancellationRequested)
+                {
+                    await ClientConnection.GetConnectedAsync(ct);
+                    await HandleConnection(ct);
+                }
+            }, ct);
+
+            var handleLog = Task.Run(async () =>
+            {
+                while (!ct.IsCancellationRequested)
+                {
+                    await LogServer.GetConnectedAsync(ct);
+                    await HandleLogConnection(ct);
+                }
+            }, ct);
+
+            await Task.WhenAll(handleClient, handleLog);
+
             ct.ThrowIfCancellationRequested();
         }
 
         public static async Task Ping(CancellationToken ct)
         {
-            await Connection.WriteAsync("PING", ct);
+            await ClientConnection.WriteAsync("PING", ct);
+        }
+
+        private static async Task HandleLogConnection(CancellationToken ct)
+        {
+            string msg;
+            while (!ct.IsCancellationRequested && (msg = await LogServer.ReadAsync(ct)) != null)
+            {
+                OnLog?.Invoke(msg);
+            }
         }
 
         private static async Task HandleConnection(CancellationToken ct)
         {
             string msg;
-            while (!ct.IsCancellationRequested && (msg = await Connection.ReadAsync(ct)) != null)
+            while (!ct.IsCancellationRequested && (msg = await ClientConnection.ReadAsync(ct)) != null)
             {
                 HandleMessage(msg);
             }
@@ -47,10 +73,6 @@ namespace OperatorUI
             if (msg.Equals("PONG", StringComparison.Ordinal))
             {
                 OnPong?.Invoke();
-            }
-            else
-            {
-                OnLog?.Invoke(msg);
             }
         }
     }

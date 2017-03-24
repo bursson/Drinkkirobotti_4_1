@@ -9,7 +9,7 @@ using NLog;
 
 namespace Common
 {   
-    public class Server
+    public class Server : IConnection
     {
         private enum ConnectionStatusEnum
         {
@@ -213,7 +213,7 @@ namespace Common
             
             _tcpListener.Start();
 
-            await Log.InfoEx(funcName, $"[{_logName}] Start listening to port {_port}");
+            Log.InfoEx(funcName, $"[{_logName}] Start listening to port {_port}");
 
             // Register CancellationToken to call _tcpListener.Stop() on cancel.
             // AcceptTcpClientAsync() then throws SocketException and cancels properly.
@@ -242,7 +242,7 @@ namespace Common
                     _sendMessageFailedSignal = new SemaphoreSlim(0, 1);
                     _receiveMessageSignal = new SemaphoreSlim(0, 1);
 
-                    await Log.InfoEx(funcName, $"[{_logName}] New connection received {_tcpClient.Client.RemoteEndPoint}");
+                    Log.InfoEx(funcName, $"[{_logName}] New connection received {_tcpClient.Client.RemoteEndPoint}");
 
                     // Throw InvalidOperationException when disconnected and trying to get stream.
                     _tcpStream = _tcpClient.GetStream();
@@ -258,7 +258,7 @@ namespace Common
                     // Check CancellationToken.
                     ct.ThrowIfCancellationRequested();
 
-                    Log.DebugEx(funcName, e.ToString());
+                    Log.DebugEx(funcName, e.ToString(), false);
                     await Task.Delay(10000, ct);
 
                     continue;
@@ -283,7 +283,7 @@ namespace Common
                     ConnectionStatus = ConnectionStatusEnum.Disconnected;
                     _tcpStream.Dispose();
                     _tcpClient.Close();
-                    Log.DebugEx(funcName, $"[{_logName}] Connection lost");
+                    Log.DebugEx(funcName, $"[{_logName}] Connection lost", false);
 
                     if (!_messageQueue.IsEmpty || _messageInQueue.CurrentCount > 0)
                     {
@@ -355,7 +355,7 @@ namespace Common
                     var msg = result.Substring(0, _implicitEndOfMessageString ? msgEndIndex : msgEndIndex + _endOfMessageString.Length);
                     result = result.Substring(msgEndIndex + _endOfMessageString.Length);
 
-                    Log.DebugEx(funcName, $"[{_logName}] Received message {msg}");
+                    Log.DebugEx(funcName, $"[{_logName}] Received message {msg}", false);
 
                     // Check token before adding message.
                     ct.ThrowIfCancellationRequested();
