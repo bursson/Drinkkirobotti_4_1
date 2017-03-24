@@ -10,21 +10,17 @@ namespace ServiceLayer
     public static class OperatorConnection
     {
         private static readonly Server ServerConnection = new Server(7676, "\r\n", true, nameof(OperatorConnection));
-        private static readonly Client LogClient = new Client(IPAddress.Parse("127.0.0.1"), 9999, "\r\n", true, nameof(OperatorConnection));
 
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
         public static async Task Run(CancellationToken ct)
         {
-            NLogExtensions.Connection = LogClient;
-
             var connTask = ServerConnection.Run(ct);
-            var clientTask = LogClient.Run(ct);
 
             while (!ct.IsCancellationRequested)
             {
-                await Task.WhenAll(ServerConnection.GetConnectedAsync(ct), LogClient.GetConnectedAsync(ct));
-                Log.InfoEx(nameof(Run), "Connected");
+                await ServerConnection.GetConnectedAsync(ct);
+                await Log.DebugEx(nameof(Run), "Connected");
                 await HandleConnection(ct);
             }
             ct.ThrowIfCancellationRequested();

@@ -11,5 +11,6 @@ namespace Common
     {
         Task<bool> WriteAsync(string msg, CancellationToken ct, bool log = false);
         Task<string> ReadAsync(CancellationToken ct);
+        Task Run(CancellationToken ct);
     }
 }
