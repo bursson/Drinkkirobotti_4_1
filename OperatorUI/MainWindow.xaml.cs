@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -61,8 +60,6 @@ namespace OperatorUI
 
         private void OnLog(string message)
         {
-            Debug.WriteLine($"{nameof(OnLog)} Got: {message}");
-
             if(message.StartsWith("LOGMESSAGE", StringComparison.Ordinal))
                 _viewModel.AddLogOutput(new LogOutput(message));
         }

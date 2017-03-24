@@ -47,12 +47,14 @@ namespace RobotService
             await DA.AddAnotherJalluToDBTest();
             NLogExtensions.InitializeLogConnection(ct, IPAddress.Parse("127.0.0.1"), 9999);
 
-            var operatorTask = OperatorConnection.Run(ct);
+            var serviceLayer = new CommService();
+            serviceLayer.Run(ct);
+
             var delayTask = Task.Delay(-1, ct);
             // Test.
             var bll = new BusinessLogic(new CommService(), new RobotCell(), new DA());
 
-            var done = await Task.WhenAny(operatorTask, delayTask);
+            var done = await Task.WhenAny(delayTask);
             ct.ThrowIfCancellationRequested();
 
         }
