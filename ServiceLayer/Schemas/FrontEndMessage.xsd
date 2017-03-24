@@ -21,7 +21,24 @@
           <xs:element name="Data">
             <xs:complexType>
               <xs:sequence>
-                <xs:element name="DummyDataElement" type="xs:string"/>
+                <xs:element name="Type" type="xs:string"/> <!-- Data type, Order etc.-->
+                <!-- Fields for Type: Order-->
+                <xs:element name="OrderAmount" type="xs:int" minOccurs="0"/> <!-- Amount of drinks ordered.-->
+                <xs:element name="OrderId" type="xs:int" minOccurs="0"/> <!-- OrderID-->
+                <xs:element name="Recipe" minOccurs="0"> <!-- Recipe of the ordered drink. -->
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element name="Portion" minOccurs="1" maxOccurs="unbounded">
+                        <xs:complexType>
+                          <xs:sequence>
+                            <xs:element name="DrinkName" type="xs:string"/>
+                            <xs:element name="Volume" type="xs:int"/>
+                          </xs:sequence>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
                 <!-- Data elements here.-->
               </xs:sequence>
             </xs:complexType>

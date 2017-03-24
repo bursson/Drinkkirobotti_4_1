@@ -40,7 +40,24 @@ namespace ServiceLayer
             await Task.Delay(10000, ct);
             return new MessageData
             {
-                DummyDataElement = "DummyDataMessage"
+                Type = "Test",
+                OrderAmount = 1,
+                OrderAmountSpecified = true,
+                OrderId = 1,
+                OrderIdSpecified = true,
+                Recipe = new []
+                {
+                    new MessageDataPortion
+                    {
+                        Volume = 8,
+                        DrinkName = "Jaloviina"
+                    }, 
+                    new MessageDataPortion()
+                    {
+                        Volume = 0,
+                        DrinkName = "JotainMuuta"
+                    }
+                }
             }; 
 
         }

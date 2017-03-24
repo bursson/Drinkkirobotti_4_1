@@ -170,15 +170,111 @@ public partial class MessageConfig {
 [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="http://tempuri.org/RobotService/FrontEndMessage")]
 public partial class MessageData {
     
-    private string dummyDataElementField;
+    private string typeField;
+    
+    private int orderAmountField;
+    
+    private bool orderAmountFieldSpecified;
+    
+    private int orderIdField;
+    
+    private bool orderIdFieldSpecified;
+    
+    private MessageDataPortion[] recipeField;
     
     /// <remarks/>
-    public string DummyDataElement {
+    public string Type {
         get {
-            return this.dummyDataElementField;
+            return this.typeField;
         }
         set {
-            this.dummyDataElementField = value;
+            this.typeField = value;
+        }
+    }
+    
+    /// <remarks/>
+    public int OrderAmount {
+        get {
+            return this.orderAmountField;
+        }
+        set {
+            this.orderAmountField = value;
+        }
+    }
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIgnoreAttribute()]
+    public bool OrderAmountSpecified {
+        get {
+            return this.orderAmountFieldSpecified;
+        }
+        set {
+            this.orderAmountFieldSpecified = value;
+        }
+    }
+    
+    /// <remarks/>
+    public int OrderId {
+        get {
+            return this.orderIdField;
+        }
+        set {
+            this.orderIdField = value;
+        }
+    }
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIgnoreAttribute()]
+    public bool OrderIdSpecified {
+        get {
+            return this.orderIdFieldSpecified;
+        }
+        set {
+            this.orderIdFieldSpecified = value;
+        }
+    }
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlArrayItemAttribute("Portion", IsNullable=false)]
+    public MessageDataPortion[] Recipe {
+        get {
+            return this.recipeField;
+        }
+        set {
+            this.recipeField = value;
+        }
+    }
+}
+
+/// <remarks/>
+[System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.6.1055.0")]
+[System.SerializableAttribute()]
+[System.Diagnostics.DebuggerStepThroughAttribute()]
+[System.ComponentModel.DesignerCategoryAttribute("code")]
+[System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="http://tempuri.org/RobotService/FrontEndMessage")]
+public partial class MessageDataPortion {
+    
+    private string drinkNameField;
+    
+    private int volumeField;
+    
+    /// <remarks/>
+    public string DrinkName {
+        get {
+            return this.drinkNameField;
+        }
+        set {
+            this.drinkNameField = value;
+        }
+    }
+    
+    /// <remarks/>
+    public int Volume {
+        get {
+            return this.volumeField;
+        }
+        set {
+            this.volumeField = value;
         }
     }
 }
