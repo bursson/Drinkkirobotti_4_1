@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FrontEndConnection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="OperatorConnection.cs" />
     <Compile Include="Schemas\OperatorMessage_FrontEndMessage.cs" />

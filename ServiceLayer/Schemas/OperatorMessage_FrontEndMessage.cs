@@ -120,6 +120,10 @@ public partial class MessageHeader {
     
     private string messageContentField;
     
+    private bool resultField;
+    
+    private bool resultFieldSpecified;
+    
     /// <remarks/>
     public string MessageType {
         get {
@@ -139,6 +143,27 @@ public partial class MessageHeader {
             this.messageContentField = value;
         }
     }
+    
+    /// <remarks/>
+    public bool Result {
+        get {
+            return this.resultField;
+        }
+        set {
+            this.resultField = value;
+        }
+    }
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIgnoreAttribute()]
+    public bool ResultSpecified {
+        get {
+            return this.resultFieldSpecified;
+        }
+        set {
+            this.resultFieldSpecified = value;
+        }
+    }
 }
 
 /// <remarks/>
@@ -149,15 +174,40 @@ public partial class MessageHeader {
 [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="http://tempuri.org/RobotService/FrontEndMessage")]
 public partial class MessageConfig {
     
-    private string dummyConfigElementField;
+    private string errorMsgField;
+    
+    private bool respondToOperatorUIField;
+    
+    private bool respondToOperatorUIFieldSpecified;
     
     /// <remarks/>
-    public string DummyConfigElement {
+    public string ErrorMsg {
         get {
-            return this.dummyConfigElementField;
+            return this.errorMsgField;
         }
         set {
-            this.dummyConfigElementField = value;
+            this.errorMsgField = value;
+        }
+    }
+    
+    /// <remarks/>
+    public bool RespondToOperatorUI {
+        get {
+            return this.respondToOperatorUIField;
+        }
+        set {
+            this.respondToOperatorUIField = value;
+        }
+    }
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIgnoreAttribute()]
+    public bool RespondToOperatorUISpecified {
+        get {
+            return this.respondToOperatorUIFieldSpecified;
+        }
+        set {
+            this.respondToOperatorUIFieldSpecified = value;
         }
     }
 }
@@ -170,6 +220,12 @@ public partial class MessageConfig {
 [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="http://tempuri.org/RobotService/FrontEndMessage")]
 public partial class MessageData {
     
+    private string errorMsgField;
+    
+    private bool respondToOperatorUIField;
+    
+    private bool respondToOperatorUIFieldSpecified;
+    
     private string typeField;
     
     private int orderAmountField;
@@ -181,6 +237,37 @@ public partial class MessageData {
     private bool orderIdFieldSpecified;
     
     private MessageDataPortion[] recipeField;
+    
+    /// <remarks/>
+    public string ErrorMsg {
+        get {
+            return this.errorMsgField;
+        }
+        set {
+            this.errorMsgField = value;
+        }
+    }
+    
+    /// <remarks/>
+    public bool RespondToOperatorUI {
+        get {
+            return this.respondToOperatorUIField;
+        }
+        set {
+            this.respondToOperatorUIField = value;
+        }
+    }
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIgnoreAttribute()]
+    public bool RespondToOperatorUISpecified {
+        get {
+            return this.respondToOperatorUIFieldSpecified;
+        }
+        set {
+            this.respondToOperatorUIFieldSpecified = value;
+        }
+    }
     
     /// <remarks/>
     public string Type {

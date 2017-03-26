@@ -77,7 +77,7 @@
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
                     <DataGridTextColumn Header="Time"
-                                        Binding="{Binding DateTime}"
+                                        Binding="{Binding TimeSent}"
                                         Width="120">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">

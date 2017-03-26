@@ -52,7 +52,7 @@ namespace RobotService
 
             var delayTask = Task.Delay(-1, ct);
             // Test.
-            var bll = new BusinessLogic(new CommService(), new RobotCell(), new DA());
+            var bll = new BusinessLogic(serviceLayer, new RobotCell(), new DA());
 
             var done = await Task.WhenAny(delayTask);
             ct.ThrowIfCancellationRequested();

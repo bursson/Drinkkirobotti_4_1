@@ -13,6 +13,7 @@
             <xs:sequence>
               <xs:element name="MessageType" type="xs:string"/> <!--Acknowledgment? OrderRequest etc?-->
               <xs:element name="MessageContent" type="xs:string"/> <!--Use this to determine the type of the following element. data/config etc.-->
+              <xs:element name="Result" type="xs:boolean" minOccurs="0"/> <!--Whether if the request was successfull. Used with responses from RobotService.-->              
               <!-- Possible additional header information here -->
             </xs:sequence>
           </xs:complexType>
@@ -21,6 +22,9 @@
           <xs:element name="Data">
             <xs:complexType>
               <xs:sequence>
+                <!--Generally used data items.-->
+                <xs:element name="ErrorMsg" type="xs:string" minOccurs="0"/> <!-- ErrorMessage if response is failure.-->
+                <xs:element name="RespondToOperatorUI" type="xs:boolean" minOccurs="0"/> <!-- Tracks where the response should go, this is incase OperatorUI sends a data message.-->
                 <xs:element name="Type" type="xs:string"/> <!-- Data type, Order etc.-->
                 <!-- Fields for Type: Order-->
                 <xs:element name="OrderAmount" type="xs:int" minOccurs="0"/> <!-- Amount of drinks ordered.-->
@@ -46,8 +50,9 @@
           <xs:element name="Config">
             <xs:complexType>
               <xs:sequence>
-                <xs:element name="DummyConfigElement" type="xs:string"/>
-                <!--config elements here. -->
+                <xs:element name="ErrorMsg" type="xs:string" minOccurs="0"/><!-- ErrorMessage if response is failure.-->
+                <xs:element name="RespondToOperatorUI" type="xs:boolean" minOccurs="0"/> <!-- Tracks where the response should go, this is incase OperatorUI sends a data message.-->
+                <!--add other config elements here. -->
               </xs:sequence>
             </xs:complexType>
           </xs:element>

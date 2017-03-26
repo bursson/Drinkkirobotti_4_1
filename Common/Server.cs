@@ -108,7 +108,7 @@ namespace Common
                 return false;
             }
 
-            if(log) await Log.DebugEx(funcName, $"[{_logName}] Sending message {msg}", false);
+            if(log) Log.DebugEx(funcName, $"[{_logName}] Sending message {msg}", false);
 
             // Add end chars here
             var msgBytes = Encoding.UTF8.GetBytes(msg + (_implicitEndOfMessageString ? _endOfMessageString : string.Empty));

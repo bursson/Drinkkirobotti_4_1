@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,39 +21,44 @@ namespace Common
 
         private static IConnection Connection { get; set; }
 
-        public static async Task TraceEx(this Logger log, string funcName, string message, bool willBeLoggedToUi = true)
+        public static void TraceEx(this Logger log, string funcName, string message, bool willBeLoggedToUi = true)
         {
             log.Trace("{0}|{1}",funcName,message);
-            await FormatMessageAndWriteASync("TRACE", funcName, message, willBeLoggedToUi);
+            Task.WaitAll(FormatMessageAndWriteASync("TRACE", funcName, message, willBeLoggedToUi));
         }
 
-        public static async Task DebugEx(this Logger log, string funcName, string message, bool willBeLoggedToUi = true)
+        public static void DebugEx(this Logger log, string funcName, string message, bool willBeLoggedToUi = true)
         {
             log.Debug("{0}|{1}", funcName, message);
 
-            await FormatMessageAndWriteASync("DEBUG", funcName, message, willBeLoggedToUi);
+            Task.WaitAll(FormatMessageAndWriteASync("DEBUG", funcName, message, willBeLoggedToUi));
 
         }
 
-        public static async Task ErrorEx(this Logger log, string funcName, string message, bool willBeLoggedToUi = true)
+        public static void WarnEx(this Logger log, string funcName, string message, bool willBeLoggedToUi = true)
+        {
+            log.Warn("{0},{1}",funcName, message);
+
+            Task.WaitAll(FormatMessageAndWriteASync("WARNING", funcName, message, willBeLoggedToUi));
+        }
+
+        public static void ErrorEx(this Logger log, string funcName, string message, bool willBeLoggedToUi = true)
         {
             log.Error("{0}|{1}", funcName, message);
-
-            await FormatMessageAndWriteASync("ERROR", funcName, message, willBeLoggedToUi);
-
+            Task.WaitAll(FormatMessageAndWriteASync("ERROR", funcName, message, willBeLoggedToUi));
         }
 
-        public static async Task FatalEx(this Logger log, string funcName, string message, bool willBeLoggedToUi = true)
+        public static void FatalEx(this Logger log, string funcName, string message, bool willBeLoggedToUi = true)
         {
             log.Fatal("{0}|{1}", funcName, message);
 
-            await FormatMessageAndWriteASync("FATAL", funcName, message, willBeLoggedToUi);
+            Task.WaitAll(FormatMessageAndWriteASync("FATAL", funcName, message, willBeLoggedToUi));
         }
-        public static async Task InfoEx(this Logger log, string funcName, string message, bool willBeLoggedToUi = true)
+        public static void InfoEx(this Logger log, string funcName, string message, bool willBeLoggedToUi = true)
         {
             log.Info("{0}|{1}", funcName, message);
             
-            await FormatMessageAndWriteASync("INFO", funcName, message, willBeLoggedToUi);
+            Task.WaitAll(FormatMessageAndWriteASync("INFO", funcName, message, willBeLoggedToUi));
         }
 
         private static async Task FormatMessageAndWriteASync(string level, string functionName, string message, bool willBeLoggedToUi)
@@ -69,7 +75,7 @@ namespace Common
                 await Connection.WriteAsync("LOGMESSAGE" +
                 separator + level +
                 separator + functionName +
-                separator + DateTime.Now +
+                separator + DateTime.Now.ToString("dd.MM.yy hh:mm:ss.fff",CultureInfo.InvariantCulture) +
                 separator + message, CancellationToken.None);
             }
         }

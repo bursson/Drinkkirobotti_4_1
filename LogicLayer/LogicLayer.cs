@@ -172,7 +172,7 @@ namespace LogicLayer
             var bottle = CurrentShelf.Find(name);
             var location = CurrentShelf.Find(bottle.BottleId);
             Log.InfoEx("GrabBottle", $"Grabbing bottle {bottle.Name} with ID: {bottle.BottleId} from location {location}");
-            await _robot.grabBottle(location);
+            await _robot.GrabBottle(location);
             _currentBottle = bottle;
         }
 
@@ -184,7 +184,7 @@ namespace LogicLayer
             CurrentShelf.AddBottle(bottle);
             var location = CurrentShelf.Find(bottle.BottleId);
             Log.InfoEx("GetNewBottle", $"Getting a new bottle {bottle.Name} with ID: {bottle.BottleId} to location {location}");
-            await _robot.getNewBottle(location);
+            await _robot.GetNewBottle(location);
             _systemState = State.Idle;
 
         }
@@ -195,7 +195,7 @@ namespace LogicLayer
             var location = CurrentShelf.Find(bottle.BottleId);
             _systemState = State.ReturnBottle;
             Log.InfoEx("returnBottle", $"Returning {bottle.Name} with ID: {bottle.BottleId} to location {location}");
-            await _robot.returnBottle(location);
+            await _robot.ReturnBottle(location);
             _currentBottle = null;
             _systemState = State.Idle;
         }
@@ -205,7 +205,7 @@ namespace LogicLayer
             if (!(_systemState == State.PourSparkling || _systemState == State.PourDrinks)) throw new StateViolationException();
             _systemState = State.ReturnBottle;
             Log.InfoEx("removeBottle", $"Removing {bottle.Name} with ID: {bottle.BottleId}");
-            await _robot.removeBottle();
+            await _robot.RemoveBottle();
             if (bottle.Name != "Sparkling")
             {
                 CurrentShelf.RemoveBottle(bottle);
@@ -219,7 +219,7 @@ namespace LogicLayer
             if (_systemState != State.GrabBottle) throw new StateViolationException();
             _systemState = State.PourDrinks;
             // Log
-            await _robot.pourBottle(amount / bottle.PourSpeed, howMany);
+            await _robot.PourBottle(amount / bottle.PourSpeed, howMany);
             bottle.Volume -= amount * howMany;
         }
 
@@ -295,6 +295,7 @@ namespace LogicLayer
         {
             const string funcName = nameof(HandleDataMessage);
             // TODO: Handle MessageData object, add to queue etc.
+            // TODO: Write response.
         }
     }
 

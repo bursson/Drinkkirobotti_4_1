@@ -171,7 +171,7 @@ namespace UnitTests
                 _queue.Add(new Order(OrderType.Beer, 2, 1), -1);
                 Assert.Fail("Expected a ArgumentOutOfRangeException");
             }
-            catch (ArgumentOutOfRangeException e)
+            catch (ArgumentOutOfRangeException)
             {
 
             }
@@ -227,7 +227,7 @@ namespace UnitTests
                 _activity.Add(new Activity(ActivityType.Idle), -5);
                 Assert.Fail("Expected a ArgumentOutOfRangeException");
             }
-            catch (ArgumentOutOfRangeException e)
+            catch (ArgumentOutOfRangeException)
             {
                 
             }

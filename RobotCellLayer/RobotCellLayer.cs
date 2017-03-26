@@ -34,45 +34,45 @@ namespace RobotCellLayer
             }
             return false;
         }
-        public async Task grabBottle(int position, int bottletype = 0)
+        public async Task<bool> GrabBottle(int position, int bottletype = 0)
         {
             if (_robot == null)
             {
                 throw new NullReferenceException("Robot is not defined");
             }
-            var result = _robot.SendCommand($"grabBottle({position},{bottletype})");
+            return await _robot.SendCommand($"grabBottle({position},{bottletype})");
         }
-        public async Task returnBottle(int position, int bottletype = 0)
+        public async Task<bool> ReturnBottle(int position, int bottletype = 0)
         {
             if (_robot == null)
             {
                 throw new NullReferenceException("Robot is not defined");
             }
-            var result = _robot.SendCommand($"returnBottle({position},{bottletype})");
+            return await _robot.SendCommand($"returnBottle({position},{bottletype})");
         }
-        public async Task getNewBottle(int position, int bottletype = 0)
+        public async Task<bool> GetNewBottle(int position, int bottletype = 0)
         {
             if (_robot == null)
             {
                 throw new NullReferenceException("Robot is not defined");
             }
-            var result = _robot.SendCommand($"getNewBottle({position},{bottletype})");
+            return await _robot.SendCommand($"getNewBottle({position},{bottletype})");
         }
-        public async Task removeBottle(int bottletype = 0)
+        public async Task<bool> RemoveBottle(int bottletype = 0)
         {
             if (_robot == null)
             {
                 throw new NullReferenceException("Robot is not defined");
             }
-            var result = _robot.SendCommand($"removeBottle({bottletype})");
+            return await _robot.SendCommand($"removeBottle({bottletype})");
         }
-        public async Task pourBottle(int amount, int howMany, int bottletype = 0)
+        public async Task<bool> PourBottle(int amount, int howMany, int bottletype = 0)
         {
             if (_robot == null)
             {
                 throw new NullReferenceException("Robot is not defined");
             }
-            var result = _robot.SendCommand($"pourDrinks({amount},{howMany},{bottletype})");
+            return await _robot.SendCommand($"pourDrinks({amount},{howMany},{bottletype})");
         }
     }
 }

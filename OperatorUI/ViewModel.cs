@@ -35,6 +35,7 @@ namespace OperatorUI
         public void AddLogOutput(LogOutput newOutput)
         {
             LogOutputs.Insert(0, newOutput);
+            // TODO This never seems to return? :o
         }
 
 

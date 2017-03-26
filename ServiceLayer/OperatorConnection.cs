@@ -20,10 +20,15 @@ namespace ServiceLayer
             while (!ct.IsCancellationRequested)
             {
                 await ServerConnection.GetConnectedAsync(ct);
-                await Log.DebugEx(nameof(Run), "Connected");
+                Log.DebugEx(nameof(Run), "Connected");
                 await HandleConnection(ct);
             }
             ct.ThrowIfCancellationRequested();
+        }
+
+        public static async Task<bool> WriteResponse(string response, CancellationToken ct)
+        {
+            return await ServerConnection.WriteAsync(response, ct);
         }
 
         private static async Task HandleConnection(CancellationToken ct)
