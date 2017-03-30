@@ -79,7 +79,7 @@ namespace LogicTest
             
             Assert.AreEqual(0, logic.Queue.Count);
             //Assert.AreEqual(80, logic.CurrentShelf.Find("Mehu").Volume);
-            Assert.AreEqual(84, logic.CurrentShelf.Find("Vodka").Volume);
+            Assert.AreEqual(80, logic.CurrentShelf.Find("Vodka").Volume);
             //Assert.IsNull(logic.CurrentShelf.Find("Mehu"));
             Assert.AreEqual(60, logic.CurrentShelf.Find("Vesi").Volume);
             logic.Dispose();
