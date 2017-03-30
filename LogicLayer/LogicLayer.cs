@@ -22,6 +22,7 @@ namespace LogicLayer
         private Task _readDataMsgLoop; // Task for read data messages, should be canceled once disposed.
         private CancellationTokenSource _readLoopCts;
         private CancellationTokenSource _linkedCts;
+        private CancellationTokenSource _currentTaskCt;
 
         private ActivityQueue _activityQueue;
         public OrderQueue Queue { get; private set; }
@@ -51,6 +52,12 @@ namespace LogicLayer
             _da = da;
         }
 
+        /// <summary>
+        /// Initializes the LogicLayer
+        /// </summary>
+        /// <param name="args">Initialize parameters</param>
+        /// <param name="ct">Cancels the initializion</param>
+        /// <returns></returns>
         public async Task<bool> Initialize(StartArguments args, CancellationToken ct)
         {
             bool result = true;
@@ -104,6 +111,11 @@ namespace LogicLayer
             }
         }
 
+        /// <summary>
+        /// Run the logic loop
+        /// </summary>
+        /// <param name="ct">Cancels the loop, exits when possible</param>
+        /// <returns></returns>
         public async Task Run(CancellationToken ct)
         {
             // TODO: Implement logic loop here with tons of private functions.
@@ -111,19 +123,24 @@ namespace LogicLayer
             _linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct,_readLoopCts.Token);
             _readDataMsgLoop = ReadFrontEndMessageLoop(_linkedCts.Token); // Start to listen for data messages.
             _systemState = State.Idle;
-            var currentTaskCt = new CancellationTokenSource();
+            _currentTaskCt = new CancellationTokenSource();
+            // Loop while cancellation is not requested
             while (!ct.IsCancellationRequested)
             {
+                // If current task is not finished skip the rest of the loop
                 if (!_currentTask.IsCompleted)
                 {
                     continue;
                 }
+                // Current activity is finished, get a new one
                 var nextActivity = _activityQueue.Pop();
-                currentTaskCt = new CancellationTokenSource();
+                _currentTaskCt = new CancellationTokenSource();
+
                 switch (nextActivity.Type)
                 {
+                    // TODO: Idle, Idledemo and Macro
                     case ActivityType.ProcessOrders:
-                        _currentTask = ProcessOrders(currentTaskCt.Token);
+                        _currentTask = ProcessOrders(_currentTaskCt.Token);
                         break;
                     case ActivityType.Idle:
                         await Task.Delay(500,ct);
@@ -138,7 +155,9 @@ namespace LogicLayer
                         throw new ArgumentOutOfRangeException();
                 }
             }
-            currentTaskCt.Cancel();
+            // Cancellation requested for the logic, tell current task
+            // to exit. Wait for it for controlled exit
+            _currentTaskCt.Cancel();
             await _currentTask;
         }
         /// <summary>
@@ -150,6 +169,7 @@ namespace LogicLayer
             const string funcName = nameof(Stop);
             Log.InfoEx(funcName, "Stopping LogicLayer.");
             
+            _currentTaskCt.Cancel();
             _readLoopCts.Cancel(); // Stop read data loop.
             await _readDataMsgLoop; // wait until loop has ended.
 
@@ -165,6 +185,11 @@ namespace LogicLayer
             _linkedCts.Dispose();
         }
 
+        /// <summary>
+        /// Grab a bottle
+        /// </summary>
+        /// <param name="name">Name of the desired bottle</param>
+        /// <returns></returns>
         private async Task GrabBottle(string name)
         {
             if (_systemState != State.Idle) throw new StateViolationException();
@@ -176,6 +201,11 @@ namespace LogicLayer
             _currentBottle = bottle;
         }
 
+        /// <summary>
+        /// Insert a new bottle in to the system
+        /// </summary>
+        /// <param name="bottle">Bottle information</param>
+        /// <returns></returns>
         private async Task GetNewBottle(Bottle bottle)
         {
             if (_systemState != State.Idle) throw new StateViolationException();
@@ -189,6 +219,11 @@ namespace LogicLayer
 
         }
 
+        /// <summary>
+        /// Return the bottle in hand to the shelf
+        /// </summary>
+        /// <param name="bottle">Bottle information</param>
+        /// <returns></returns>
         private async Task ReturnBottle(Bottle bottle)
         {
             if (_systemState != State.PourDrinks) throw new StateViolationException();
@@ -200,6 +235,11 @@ namespace LogicLayer
             _systemState = State.Idle;
         }
 
+        /// <summary>
+        /// Remove the bottle in hand from the system
+        /// </summary>
+        /// <param name="bottle">Bottle information</param>
+        /// <returns></returns>
         private async Task RemoveBottle(Bottle bottle)
         {
             if (!(_systemState == State.PourSparkling || _systemState == State.PourDrinks)) throw new StateViolationException();
@@ -214,6 +254,13 @@ namespace LogicLayer
             _systemState = State.Idle;
         }
 
+        /// <summary>
+        /// Pour from the bottle in hand
+        /// </summary>
+        /// <param name="bottle">Bottle information</param>
+        /// <param name="amount">Pour amount (cl)</param>
+        /// <param name="howMany">How many pours</param>
+        /// <returns></returns>
         private async Task PourBottle(Bottle bottle, int amount, int howMany)
         {
             if (_systemState != State.GrabBottle) throw new StateViolationException();
@@ -223,6 +270,12 @@ namespace LogicLayer
             bottle.Volume -= amount * howMany;
         }
 
+        /// <summary>
+        /// Pour a drink
+        /// </summary>
+        /// <param name="drink">Drink information</param>
+        /// <param name="howMany">How many drinks</param>
+        /// <returns></returns>
         private async Task PourDrink(Drink drink, int howMany)
         {
             foreach (var portion in drink.Portions())
@@ -241,6 +294,11 @@ namespace LogicLayer
             }
         }
 
+        /// <summary>
+        /// Process orders from the _orderqueue
+        /// </summary>
+        /// <param name="ct">Token for cancelling the processing</param>
+        /// <returns></returns>
         private async Task ProcessOrders(CancellationToken ct)
         {
             if (Queue.Count < 1)
