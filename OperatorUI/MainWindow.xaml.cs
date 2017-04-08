@@ -41,6 +41,7 @@ namespace OperatorUI
         ~MainWindow()
         {
             RobotServiceConnection.OnPong -= OnPong;
+            RobotServiceConnection.OnLog -= OnLog;
         }
         
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
@@ -61,7 +62,7 @@ namespace OperatorUI
         private void OnLog(string message)
         {
             if(message.StartsWith("LOGMESSAGE", StringComparison.Ordinal))
-                _viewModel.AddLogOutput(new LogOutput(message));
+                Dispatcher.Invoke(() => _viewModel.AddLogOutput(new LogOutput(message)));
         }
     }
 }
