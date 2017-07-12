@@ -9,6 +9,7 @@ namespace Common
     {
         public string Data { get; private set; }
         public ActivityType Type { get; private set; }
+
         public Activity(ActivityType activityType, string data = null)
         {
             if (data != null)
@@ -70,16 +71,17 @@ namespace Common
             this.Name = name;
             this.Amount = amount;
         }
-        
+
         /// <summary>
         /// Check if the portion is valid
         /// </summary>
         /// <returns>True if the bottle has a name and amount is over zero</returns>
         public bool IsValid()
         {
-            return  Name.Length > 0 && Amount > 0;
+            return Name.Length > 0 && Amount > 0;
         }
     }
+
     public class Drink
     {
         private readonly List<Portion> _portions;
@@ -93,6 +95,7 @@ namespace Common
             Name = name;
             _portions = new List<Portion>();
         }
+
         /// <summary>
         /// Add a postion to the drink
         /// </summary>
@@ -167,7 +170,7 @@ namespace Common
             _drink = drink;
             _howMany = howMany;
         }
-        
+
         [PrimaryKey, AutoIncrement]
         public int OrderId { get; set; }
 
@@ -202,7 +205,7 @@ namespace Common
         // For sql
         public Bottleshelf()
         {
-            
+
         }
 
         [PrimaryKey, AutoIncrement]
@@ -261,7 +264,7 @@ namespace Common
             {
                 if (Shelf[i] != null && Shelf[i].Name == bottlename)
                 {
-                    res.Add(Shelf[i]); 
+                    res.Add(Shelf[i]);
                 }
             }
             return res;
@@ -317,8 +320,8 @@ namespace Common
                 int portionAvailable = 0;
                 foreach (Bottle b in Find(p.Name))
                 {
-                    // TODO: how do we handle removelimit, atm solution is very safe
-                    int availableInThisBottle = b.Volume-_removelimit / p.Amount;
+                    // TODO: how do we handle removelimit?
+                    int availableInThisBottle = (b.Volume - (_removelimit / 2)) / p.Amount;
                     portionAvailable += availableInThisBottle;
                 }
 
@@ -329,6 +332,5 @@ namespace Common
             }
             return result;
         }
-
     }
 }
