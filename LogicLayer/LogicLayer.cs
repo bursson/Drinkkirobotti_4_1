@@ -194,7 +194,7 @@ namespace LogicLayer
         {
             if (_systemState != State.Idle) throw new StateViolationException();
             _systemState = State.GrabBottle;
-            var bottle = CurrentShelf.Find(name);
+            var bottle = CurrentShelf.Find(name)[0];
             var location = CurrentShelf.Find(bottle.BottleId);
             Log.InfoEx("GrabBottle", $"Grabbing bottle {bottle.Name} with ID: {bottle.BottleId} from location {location}");
             await _robot.GrabBottle(location);

@@ -33,7 +33,7 @@ namespace LogicTest
             rob.AddRobot("SIM", "SIM");
             logic = new LogicLayer.LogicLayer(ser, rob, da);
 
-            var shelf = new Bottleshelf(10);
+            var shelf = new Bottleshelf(10, 0);
             shelf.AddBottle(new Bottle("Vodka"));
             shelf.AddBottle(new Bottle("Vesi"));
             shelf.AddBottle(new Bottle("Mehu"));
@@ -79,9 +79,9 @@ namespace LogicTest
             
             Assert.AreEqual(0, logic.Queue.Count);
             //Assert.AreEqual(80, logic.CurrentShelf.Find("Mehu").Volume);
-            Assert.AreEqual(80, logic.CurrentShelf.Find("Vodka").Volume);
+            Assert.AreEqual(80, logic.CurrentShelf.Find("Vodka") [0].Volume);
             //Assert.IsNull(logic.CurrentShelf.Find("Mehu"));
-            Assert.AreEqual(60, logic.CurrentShelf.Find("Vesi").Volume);
+            Assert.AreEqual(50, logic.CurrentShelf.Find("Vesi")[0].Volume);
             logic.Dispose();
         }
     }

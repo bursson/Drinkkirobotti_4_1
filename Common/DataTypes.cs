@@ -129,6 +129,11 @@ namespace Common
             return false;
         }
 
+        public Portion[] GetPortions()
+        {
+            return _portions.ToArray();
+        }
+
         /// <summary>
         /// Insert a new portion to the drink
         /// </summary>
@@ -188,9 +193,10 @@ namespace Common
         /// Create a new bottle shelf
         /// </summary>
         /// <param name="size">Maximum amout of bottles in the shelf</param>
-        public Bottleshelf(int size)
+        public Bottleshelf(int size, int removelimit)
         {
             Shelf = new Bottle[size];
+            _removelimit = removelimit;
         }
 
         // For sql
@@ -201,6 +207,8 @@ namespace Common
 
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
+
+        private int _removelimit;
 
         /// <summary>
         /// Add a bottle to the shelf
@@ -221,24 +229,6 @@ namespace Common
             return false;
         }
 
-        /// <summary>
-        /// Remove a bottle from the shelf
-        /// </summary>
-        /// <param name="bottlename">Name of the bottle to be removed</param>
-        /// <returns>True if bottle was removed</returns>
-        public bool RemoveBottle(string bottlename)
-        {
-            for (int i = 0; i < Size(); i++)
-            {
-                if (Shelf[i] != null && Shelf[i].Name == bottlename)
-                {
-                    Shelf[i] = null;
-                    return true;
-                }
-                
-            }
-            return false;
-        }
         /// <summary>
         /// Remove a bottle from the shelf
         /// </summary>
@@ -263,17 +253,18 @@ namespace Common
         /// Search for a bottle
         /// </summary>
         /// <param name="bottlename">Name of the bottle</param>
-        /// <returns>The Bottle object if found, else null</returns>
-        public Bottle Find(string bottlename)
+        /// <returns>List of bottles with that name</returns>
+        public List<Bottle> Find(string bottlename)
         {
+            List<Bottle> res = new List<Bottle>();
             for (int i = 0; i < Size(); i++)
             {
                 if (Shelf[i] != null && Shelf[i].Name == bottlename)
                 {
-                    return Shelf[i];
+                    res.Add(Shelf[i]); 
                 }
             }
-            return null;
+            return res;
         }
 
         public int Find(int id)
@@ -313,6 +304,31 @@ namespace Common
             return res;
         }
 
+        /// <summary>
+        /// How many drinks can be prepared with current shelf
+        /// </summary>
+        /// <param name="drink">Drink-object</param>
+        /// <returns>Amount of drinks that can be produced</returns>
+        public int AmountAvailable(Drink drink)
+        {
+            int result = 1000;
+            foreach (Portion p in drink.GetPortions())
+            {
+                int portionAvailable = 0;
+                foreach (Bottle b in Find(p.Name))
+                {
+                    // TODO: how do we handle removelimit, atm solution is very safe
+                    int availableInThisBottle = b.Volume-_removelimit / p.Amount;
+                    portionAvailable += availableInThisBottle;
+                }
+
+                if (portionAvailable < result)
+                {
+                    result = portionAvailable;
+                }
+            }
+            return result;
+        }
 
     }
 }

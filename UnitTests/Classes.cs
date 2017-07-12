@@ -29,7 +29,7 @@ namespace UnitTests
         {
             _bottleshelf = new List<Bottle>(); //TODO: replace with actual bottleshelf
             _drinkdb = new List<Drink>();
-            _bs = new Bottleshelf(shelfsize);
+            _bs = new Bottleshelf(shelfsize, 10);
             _queue = new OrderQueue();
             _activity = new ActivityQueue(new Activity(ActivityType.Idle));
         }
@@ -45,13 +45,13 @@ namespace UnitTests
                 Assert.AreEqual(_bs.AvailableSlots(), shelfsize-1-i);
             }
             Assert.IsFalse(_bs.AddBottle(new Bottle("fail")), "Bottleshelf overflow");
-            Assert.IsTrue(_bs.RemoveBottle("Testbottle5"));
+            Assert.IsTrue(_bs.RemoveBottle(_bs.Find("Testbottle5")[0]));
             Assert.AreEqual(_bs.AvailableSlots(), 1);
-            Assert.IsTrue(_bs.RemoveBottle("Testbottle0"));
-            Assert.IsTrue(_bs.RemoveBottle("Testbottle9"));
+            Assert.IsTrue(_bs.RemoveBottle(_bs.Find("Testbottle0")[0]));
+            Assert.IsTrue(_bs.RemoveBottle(_bs.Find("Testbottle9")[0]));
             Assert.AreEqual(_bs.AvailableSlots(), 3);
-            Assert.IsNull(_bs.Find("Testbottle"));
-            var checkBottle = _bs.Find("Testbottle3");
+            Assert.AreEqual(0,_bs.Find("Testbottle").Count);
+            var checkBottle = _bs.Find("Testbottle3")[0];
             Assert.AreEqual(100, checkBottle.MaxVolume);
             Assert.AreEqual(checkBottle.Name,"Testbottle3");
 
