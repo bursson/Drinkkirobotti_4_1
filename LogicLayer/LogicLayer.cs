@@ -229,7 +229,7 @@ namespace LogicLayer
             if (_systemState != State.PourDrinks) throw new StateViolationException();
             var location = CurrentShelf.Find(bottle.BottleId);
             _systemState = State.ReturnBottle;
-            Log.InfoEx("returnBottle", $"Returning {bottle.Name} with ID: {bottle.BottleId} to location {location}");
+            Log.InfoEx("ReturnBottle", $"Returning {bottle.Name} with ID: {bottle.BottleId} to location {location}");
             await _robot.ReturnBottle(location);
             _currentBottle = null;
             _systemState = State.Idle;
@@ -244,7 +244,7 @@ namespace LogicLayer
         {
             if (!(_systemState == State.PourSparkling || _systemState == State.PourDrinks)) throw new StateViolationException();
             _systemState = State.ReturnBottle;
-            Log.InfoEx("removeBottle", $"Removing {bottle.Name} with ID: {bottle.BottleId}");
+            Log.InfoEx("RemoveBottle", $"Removing {bottle.Name} with ID: {bottle.BottleId}");
             await _robot.RemoveBottle();
             if (bottle.Name != "Sparkling")
             {
@@ -265,9 +265,29 @@ namespace LogicLayer
         {
             if (_systemState != State.GrabBottle) throw new StateViolationException();
             _systemState = State.PourDrinks;
-            // Log
-            await _robot.PourBottle(amount / bottle.PourSpeed, howMany);
-            bottle.Volume -= amount * howMany;
+            // Check how many portions are left in current bottle
+            // TODO: Is the safety value OK?
+            int leftInBottle = (bottle.Volume - REMOVELIMIT / 2) / amount;
+            // Not enough portions in current bottle alone
+            if (leftInBottle < howMany)
+            {
+                Log.InfoEx("PourBottle", $"Not enough {bottle.Name} in ID: {bottle.BottleId}, pouring only {leftInBottle} portions from {howMany}");
+                await _robot.PourBottle(amount / bottle.PourSpeed, leftInBottle);
+                howMany -= leftInBottle;
+                bottle.Volume -= amount * leftInBottle;
+                await RemoveBottle(bottle);
+                // TODO: Error if no more bottles with same name
+                await GrabBottle(bottle.Name);
+                // Use recursion to go through bottles until all drinks poured
+                await PourBottle(_currentBottle, amount, howMany);
+            }
+            else
+            {
+                Log.InfoEx("PourBottle", $"Pouring {howMany} portions {bottle.Name} from ID: {bottle.BottleId}");
+                await _robot.PourBottle(amount / bottle.PourSpeed, howMany);
+                bottle.Volume -= amount * howMany;
+            }
+           
         }
 
         /// <summary>
