@@ -401,8 +401,7 @@ namespace LogicLayer
                         {
                             response.Type = "FAILURE";
                             response.ErrorMsg = "Not enough ingredients";
-                            return await _service.WriteAsync(new CancellationToken(), response,
-                                response.Type == "OK" ? true : false);
+                            return await _service.WriteAsync(new CancellationToken(), response, false);
                         }
 
                         // Partial order fullfillment is allowed and there are ingredients to atleast 1 drink
@@ -418,8 +417,19 @@ namespace LogicLayer
                         response.Type = "OK";
                         Log.DebugEx(funcName, $"Adding order {newOrder.OrderId} to queue with {data.OrderAmount} drinks");
                     }
-                    
-                    // Add to queue TODO: How to determine priority and reserve the ingredients needed
+
+                    // Reserve the required ingredients and store the bottles to the order
+                    newOrder.BottlesToUse = _reservedShelf.Reserve(newOrder);
+
+                    // Check that the recipe was valid
+                    if (newOrder.BottlesToUse == null)
+                    {
+                        response.Type = "FAILURE";
+                        response.ErrorMsg = "Invalid drink recipe";
+                        return await _service.WriteAsync(new CancellationToken(), response, false);
+                    }
+
+                    // Add to queue TODO: How to determine priority
                     if (Queue.Add(newOrder, 100))
                     {
                         return await _service.WriteAsync(new CancellationToken(), response,
