@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NLog;
 using Common;
+using NLog.Layouts;
 using CommService = ServiceLayer.ServiceLayer; // Set custom names for the classes to make the code less filled with dots.
 using RobotCell = RobotCellLayer.RobotCellLayer; //
 using DA = DataAccess.DataAccess; //
@@ -34,6 +35,8 @@ namespace LogicLayer
         private bool _beer;
         private bool _drinks;
         private bool _sparkling;
+
+        private bool _partialOrderFullfill;
 
         private static int REMOVELIMIT = 15;
 
@@ -84,6 +87,10 @@ namespace LogicLayer
             _sparkling = args.Sparkling;
 
             _currentTask = Task.Delay(1);
+
+            // Additional arguments
+
+            _partialOrderFullfill = args.FullfillOrdersPartially;
 
             // Initialize the robot, TODO: read port from cfg and throw if false
             switch (args.Mode)
@@ -356,7 +363,7 @@ namespace LogicLayer
                     Log.InfoEx(funcName, "Waiting for front-end data messages..");
                     var data = await _service.ReadDataAsync(ct);
                     Log.InfoEx(funcName, "Received data from front-end.");
-                    HandleDataMessage(data);
+                    await HandleDataMessage(data);
                 }
             }
             catch (OperationCanceledException)
@@ -369,11 +376,82 @@ namespace LogicLayer
         /// Handles the read messages from ServiceLayer
         /// </summary>
         /// <param name="data"></param>
-        private void HandleDataMessage(MessageData data)
+        private async Task<bool> HandleDataMessage(MessageData data)
         {
             const string funcName = nameof(HandleDataMessage);
-            // TODO: Handle MessageData object, add to queue etc.
-            // TODO: Write response.
+            // TODO: Parallel message handling? (probably not a good idea)
+
+            switch (data.Type)
+            {
+                case "Order":
+                    // Response to front TODO: Response parameters
+                    var response = new MessageData {OrderId = data.OrderId, OrderAmount =  data.OrderAmount};
+
+                    // If ordertype = Drink
+                    var orderedDrink = ParseDrink(data.Recipe);
+                    var newOrder = new Order(OrderType.Drink, data.OrderId, data.OrderAmount, orderedDrink);
+
+                    // Check if enough ingredients
+                    var amountAvailable = _reservedShelf.AmountAvailable(orderedDrink);
+                    if (amountAvailable < data.OrderAmount)
+                    {
+                        // If partial order fullfillment is not allowed or no ingredients left
+                        // for a drink send a failure and return
+                        if (!_partialOrderFullfill || amountAvailable <= 0)
+                        {
+                            response.Type = "FAILURE";
+                            response.ErrorMsg = "Not enough ingredients";
+                            return await _service.WriteAsync(new CancellationToken(), response,
+                                response.Type == "OK" ? true : false);
+                        }
+
+                        // Partial order fullfillment is allowed and there are ingredients to atleast 1 drink
+                        newOrder._howMany = amountAvailable;
+                        response.Type = "ERROR";
+                        response.ErrorMsg = $"Only {amountAvailable} drinks added to queue";
+                        Log.DebugEx(funcName,
+                            $"Adding a partial order {newOrder.OrderId} to queue with {amountAvailable} drinks out of ordered {data.OrderAmount}");
+                    }
+                    else
+                    {
+                        // Full amount available, everything is OK
+                        response.Type = "OK";
+                        Log.DebugEx(funcName, $"Adding order {newOrder.OrderId} to queue with {data.OrderAmount} drinks");
+                    }
+                    
+                    // Add to queue TODO: How to determine priority and reserve the ingredients needed
+                    if (Queue.Add(newOrder, 100))
+                    {
+                        return await _service.WriteAsync(new CancellationToken(), response,
+                            response.Type == "OK");
+                    }
+
+                    // Could not add to queue, send and log error
+                    response.Type = "FAILURE";
+                    response.ErrorMsg = "Could not add to queue";
+                    Log.ErrorEx(funcName, $"Error in adding order {newOrder.OrderId} to queue");
+                    return await _service.WriteAsync(new CancellationToken(), response, false);
+
+                case "Config":
+                    // TODO: Handle configure messages
+                    throw new NotImplementedException();
+
+                default:
+                    Log.ErrorEx(funcName, $"Unknown MessageData Type \"{data.Type}\" ");
+                    return false;
+            }
+
+            
+        }
+
+        private Drink ParseDrink(MessageDataPortion[] msg)
+        {
+            var result = new Drink("Drink");
+            foreach (MessageDataPortion p in msg)
+            {
+                result.AddPortion(p.DrinkName, p.Volume);
+            }
+            return result;
         }
     }
 
@@ -387,6 +465,7 @@ namespace LogicLayer
         public Bottleshelf BackupShelf { get; set; }
         public Activity IdleActivity { get; set; }
         public OrderQueue BacckupQueue { get; set; }
+        public bool FullfillOrdersPartially { get; set; }
     }
 
 
