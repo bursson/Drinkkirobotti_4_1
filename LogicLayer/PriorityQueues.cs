@@ -20,6 +20,66 @@ namespace LogicLayer
             Add(new Tuple<Order, int>(neworder, priority));
             return true;
         }
+
+        /// <summary>
+        /// Remove order with the given id from the queue
+        /// </summary>
+        /// <param name="id">Id of the order to remove</param>
+        /// <returns>The removed order. If not found returns null</returns>
+        public Order Remove(int id)
+        {
+            foreach (var i in this)
+            {
+                if (i.Item1.OrderId == id)
+                {
+                    if (Remove(i))
+                    {
+                        return i.Item1;
+                    }
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Remove the given order from the queue
+        /// </summary>
+        /// <param name="order"></param>
+        /// <returns>True if successfull</returns>
+        public bool Remove(Order order)
+        {
+            foreach (var i in this)
+            {
+                if (i.Item1 == order)
+                {
+                    return Remove(i);
+                }
+            }
+            return false;
+        }
+
+
+        /// <summary>
+        /// Find all orders cointaining the given bottle
+        /// </summary>
+        /// <param name="bottle"></param>
+        /// <returns>List of Tuples containing orders and their priority</returns>
+        public List<Tuple<Order, int>> Find(Bottle bottle)
+        {
+            var result = new List<Tuple<Order, int>>();
+            foreach (var i in this)
+            {
+                foreach (var p in i.Item1.BottlesToUse)
+                {
+                    if (p.Item1 == bottle)
+                    {
+                        result.Add(i);
+                        break;
+                    }
+                }
+            }
+            return result;
+        }
         
         public Order Pop()
         {
