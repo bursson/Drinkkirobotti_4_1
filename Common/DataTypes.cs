@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.AccessControl;
 using NLog;
 using NLog.Layouts;
@@ -362,8 +363,8 @@ namespace Common
                 foreach (Bottle b in bottles)
                 {
                     // Check how much liquid left in bottle TODO: How to handle removelimit
-                    var available = b.Volume - _removelimit / 2;
-                    if (available < amountToPour)
+                    var available = (b.Volume - _removelimit / 2) / amountToPour;
+                    if (available < order._howMany)
                     {
                         b.Volume -= available * p.Amount;
                         amountToPour -= available * p.Amount;
@@ -382,6 +383,23 @@ namespace Common
             }
             Log.ErrorEx(funcName, $"No portions in the drink being reserved in order {order.OrderId}");
             return null;
+        }
+
+        /// <summary>
+        /// Dereserve ingredients reserved by an order. Throws, if order bottles include a bottle which is not present
+        /// in the recipe, or if the recipe includes multiple portions with same name.
+        /// </summary>
+        /// <param name="order"></param>
+        /// <returns>True if successfull</returns>
+        public bool Dereserve(Order order)
+        {
+            // Add the reserved amount back to the bottles reserved originaly by the order
+            foreach (var b in order.BottlesToUse)
+            {
+                // Amount added is the amount of portions multiplied by the portion amount specified in the recipe
+                b.Item1.Volume += b.Item2 * order.GetRecipe().Portions().Single(p => p.Name == b.Item1.Name).Amount;
+            }
+            return true;
         }
     }
 }
