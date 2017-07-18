@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.AccessControl;
+using NLog;
+using NLog.Layouts;
 using SQLite;
 
 namespace Common
@@ -155,6 +157,7 @@ namespace Common
         private readonly OrderType _orderType;
         private Drink _drink;
         public int _howMany;
+        
 
         /// <summary>
         /// Create new order
@@ -186,10 +189,15 @@ namespace Common
             return _drink;
         }
 
+        public List<Tuple<Bottle, int>> BottlesToUse { get; set; }
+
+
     }
 
     public class Bottleshelf
     {
+        private static Logger Log = LogManager.GetCurrentClassLogger();
+
         public Bottle[] Shelf { get; }
 
         /// <summary>
@@ -331,6 +339,49 @@ namespace Common
                 }
             }
             return result;
+        }
+
+        public List<Tuple<Bottle, int>> Reserve(Order order)
+        {
+            const string funcName = nameof(Reserve);
+
+            // Should never happen, exception maybe?
+            if (AmountAvailable(order.GetRecipe()) < order._howMany)
+            {
+                Log.ErrorEx(funcName, $"Not enough ingredients available for the drink being reserved in order {order.OrderId}");
+                return null;
+            }
+            var result = new List<Tuple<Bottle, int>>();
+            
+            // Iterate through all portions in order
+            foreach (Portion p in order.GetRecipe().Portions())
+            {
+                // Get all bottles with that name and iteratre through them until required amount is reached
+                var amountToPour = p.Amount * order._howMany;
+                var bottles = Find(p.Name);
+                foreach (Bottle b in bottles)
+                {
+                    // Check how much liquid left in bottle TODO: How to handle removelimit
+                    var available = b.Volume - _removelimit / 2;
+                    if (available < amountToPour)
+                    {
+                        b.Volume -= available * p.Amount;
+                        amountToPour -= available * p.Amount;
+                        result.Add(new Tuple<Bottle, int>(b, available));
+                    }
+                    else
+                    {
+                        // Last bottle to consider, add to result and return
+                        b.Volume -= amountToPour;
+                        result.Add(new Tuple<Bottle, int>(b, order._howMany));
+                        return result;
+                    }
+                }
+                Log.FatalEx(funcName, $"No bottles or not enough bottles to reserve the order {order.OrderId}");
+                throw new NotImplementedException();
+            }
+            Log.ErrorEx(funcName, $"No portions in the drink being reserved in order {order.OrderId}");
+            return null;
         }
     }
 }
