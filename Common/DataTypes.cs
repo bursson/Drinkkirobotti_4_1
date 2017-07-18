@@ -363,7 +363,7 @@ namespace Common
                 foreach (Bottle b in bottles)
                 {
                     // Check how much liquid left in bottle TODO: How to handle removelimit
-                    var available = (b.Volume - _removelimit / 2) / amountToPour;
+                    var available = (b.Volume - _removelimit / 2) / p.Amount;
                     if (available < order._howMany)
                     {
                         b.Volume -= available * p.Amount;
